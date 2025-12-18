@@ -1,0 +1,199 @@
+.gameCard {
+  background: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.gameCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.gameImage {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.gameImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.gameCard:hover .gameImage img {
+  transform: scale(1.05);
+}
+
+.favoriteBtn {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  background: rgba(255,255,255,0.9);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--gray);
+  transition: all 0.3s;
+}
+
+.favoriteBtn:hover,
+.favoriteBtn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.gameRating {
+  position: absolute;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.gameInfo {
+  padding: var(--space-lg);
+}
+
+.gameInfo h3 {
+  font-size: 1.3rem;
+  margin-bottom: var(--space-md);
+  color: var(--primary);
+}
+
+.gameMeta {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.platform {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Все варианты платформ из оригинального CSS */
+.platform.pc {
+  background: #3498db;
+  color: white;
+}
+
+.platform.playstation {
+  background: #003087;
+  color: white;
+}
+
+.platform.ps {
+  background: #003087;
+  color: white;
+}
+
+.platform.ps5 {
+  background: #003087;
+  color: white;
+}
+
+.platform.xbox {
+  background: #107c10;
+  color: white;
+}
+
+.gameGenres {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.genre {
+  padding: var(--space-xs) var(--space-md);
+  background: var(--light);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--dark);
+}
+
+.gameDescription {
+  color: var(--gray);
+  margin-bottom: var(--space-lg);
+  line-height: 1.5;
+  font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gameActions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  flex: 1;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.wishlistBtn {
+  background: var(--light);
+  color: var(--dark);
+  border: 2px solid transparent;
+}
+
+.wishlistBtn:hover {
+  background: var(--warning);
+  color: white;
+  border-color: var(--warning);
+}
+
+.wishlistBtn.inWishlist {
+  background: var(--warning);
+  color: white;
+  border-color: var(--warning);
+}
+
+.detailsBtn {
+  background: var(--secondary);
+  color: white;
+  border: 2px solid transparent;
+}
+
+.detailsBtn:hover {
+  background: #2980b9;
+  border-color: #2980b9;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .gameActions {
+    flex-direction: column;
+  }
+  
+  .gameImage {
+    height: 180px;
+  }
+}

@@ -1,0 +1,508 @@
+.gameDetailsPage {
+  padding: var(--space-xl) 0;
+  min-height: calc(100vh - 300px);
+}
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+  font-size: 0.9rem;
+}
+
+.breadcrumbs a {
+  color: var(--secondary);
+  text-decoration: none;
+}
+
+.breadcrumbs .separator {
+  color: var(--gray);
+}
+
+.breadcrumbs .current {
+  color: var(--dark);
+  font-weight: 600;
+}
+
+.gameHero {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.gameGallery .mainImage {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.mainImage img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.imageThumbnails {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.thumb {
+  width: 100px;
+  height: 60px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.thumb.active,
+.thumb:hover {
+  opacity: 1;
+  border: 2px solid var(--secondary);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gameSidebar {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  height: fit-content;
+}
+
+.gameHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.gameHeader h1 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin: 0;
+}
+
+.gameActionsTop {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.favoriteBtn.large,
+.wishlistBtn.large {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+}
+
+.favoriteBtn.large {
+  background: var(--accent);
+  color: white;
+}
+
+.favoriteBtn.large:hover {
+  background: #c0392b;
+}
+
+.wishlistBtn.large {
+  background: var(--light);
+  color: var(--dark);
+}
+
+.wishlistBtn.large:hover {
+  background: #dfe6e9;
+}
+
+.wishlistBtn.large.active {
+  background: var(--warning);
+  color: white;
+}
+
+.gameRatingLarge {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--light);
+  border-radius: var(--radius-md);
+}
+
+.ratingScore {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.ratingStars {
+  font-size: 1.2rem;
+  color: var(--warning);
+  margin: var(--space-sm) 0;
+}
+
+.ratingCount {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.compatibilityBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: linear-gradient(135deg, var(--success), #27ae60);
+  color: white;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+}
+
+.compatIcon {
+  font-size: 2rem;
+}
+
+.compatPercent {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.compatText {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.gameMetaDetail {
+  margin-bottom: var(--space-lg);
+}
+
+.metaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.metaItem:last-child {
+  border-bottom: none;
+}
+
+.metaItem .platform {
+  margin-left: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.metaItem .platform.pc {
+  background: #3498db;
+  color: white;
+}
+
+.metaItem .platform.playstation {
+  background: #003087;
+  color: white;
+}
+
+.metaItem .platform.xbox {
+  background: #107c10;
+  color: white;
+}
+
+.priceSection {
+  text-align: center;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.priceOld {
+  text-decoration: line-through;
+  color: var(--gray);
+  margin: var(--space-sm) 0;
+}
+
+.discount {
+  background: var(--accent);
+  color: white;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.btnBuy {
+  background: var(--success);
+  color: white;
+  width: 100%;
+  padding: var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btnBuy:hover {
+  background: #27ae60;
+}
+
+.gameContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-2xl);
+}
+
+.contentMain section {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-xl);
+}
+
+.contentMain h2 {
+  color: var(--primary);
+  margin-bottom: var(--space-lg);
+  font-size: 1.5rem;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-lg);
+}
+
+.featureItem {
+  text-align: center;
+  padding: var(--space-lg);
+  background: var(--light);
+  border-radius: var(--radius-md);
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.featureItem h4 {
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.requirementsTabs {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.reqTab {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--light);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.reqTab.active {
+  background: var(--secondary);
+  color: white;
+}
+
+.reqSpecs {
+  display: none;
+}
+
+.reqSpecs.active {
+  display: block;
+}
+
+.specItem {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.specItem:last-child {
+  border-bottom: none;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.sidebarWidget {
+  background: white;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.sidebarWidget h3 {
+  color: var(--primary);
+  margin-bottom: var(--space-md);
+  font-size: 1.2rem;
+}
+
+.similarGame {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.similarGame:last-child {
+  border-bottom: none;
+}
+
+.similarGame img {
+  width: 60px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.similarInfo h4 {
+  font-size: 0.9rem;
+  color: var(--primary);
+  margin-bottom: var(--space-xs);
+}
+
+.similarRating {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.achievement:last-child {
+  border-bottom: none;
+}
+
+.achievementIcon {
+  font-size: 1.5rem;
+}
+
+.achievementName {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.9rem;
+}
+
+.achievementDesc {
+  color: var(--gray);
+  font-size: 0.8rem;
+  margin: var(--space-xs) 0;
+}
+
+.achievementProgress {
+  color: var(--secondary);
+  font-size: 0.7rem;
+}
+
+.loading, .notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  padding: 2rem;
+}
+
+.notFound h2 {
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.notFound button {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.notFound button:hover {
+  background: #2980b9;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .gameHero,
+  .gameContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .gameHeader {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  
+  .imageThumbnails {
+    justify-content: center;
+  }
+  
+  .mainImage img {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .requirementsTabs {
+    flex-direction: column;
+  }
+  
+  .gameHeader h1 {
+    font-size: 1.5rem;
+  }
+  
+  .price {
+    font-size: 1.5rem;
+  }
+  
+  .ratingScore {
+    font-size: 2rem;
+  }
+  
+  .similarGame {
+    flex-direction: column;
+    text-align: center;
+  }
+}

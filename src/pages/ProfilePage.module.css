@@ -1,0 +1,499 @@
+.profilePage {
+  padding: var(--space-xl) 0;
+  min-height: calc(100vh - 300px);
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.pageHeader h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.pageHeader p {
+  color: var(--gray);
+  font-size: 1.1rem;
+}
+
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.profileCard {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.profileAvatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--secondary);
+}
+
+.profileAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarStatus {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.avatarStatus.online {
+  background: var(--success);
+}
+
+.profileInfo {
+  flex: 1;
+}
+
+.profileInfo h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--space-xs);
+}
+
+.profileTag {
+  color: var(--gray);
+  margin-bottom: var(--space-md);
+}
+
+.profileStats {
+  display: flex;
+  gap: var(--space-xl);
+}
+
+.profileStat {
+  text-align: center;
+}
+
+.profileStat .statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  display: block;
+}
+
+.profileStat .statLabel {
+  font-size: 0.8rem;
+  color: var(--gray);
+}
+
+.profileActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.btnEdit {
+  background: var(--light);
+  color: var(--dark);
+  border: none;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btnEdit:hover {
+  background: #dfe6e9;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.formInput {
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+}
+
+.editActions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.btnSave {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btnCancel {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.statIcon {
+  font-size: 2rem;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.statLabel {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.recentGames {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.recentGames h3 {
+  color: var(--primary);
+  margin-bottom: var(--space-lg);
+  font-size: 1.5rem;
+}
+
+.gamesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recentGame {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--light);
+  border-radius: var(--radius-md);
+  transition: background 0.3s;
+}
+
+.recentGame:hover {
+  background: #e0e0e0;
+}
+
+.recentGame img {
+  width: 60px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+}
+
+.gameDetails h4 {
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.gameMeta {
+  display: flex;
+  gap: var(--space-md);
+  font-size: 0.9rem;
+}
+
+.gameMeta .rating {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.gameMeta .playtime {
+  color: var(--secondary);
+}
+
+.gameMeta .completion {
+  color: var(--success);
+}
+
+.dnaAnalyzer {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.dnaAnalyzer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dnaPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dnaPattern)"/></svg>');
+}
+
+.dnaAnalyzer h3 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.dnaContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: center;
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.dnaVisualization {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.playerAvatar {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid white;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.playerAvatar:hover {
+  transform: scale(1.05);
+}
+
+.playerAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  padding: var(--space-md) 0 var(--space-sm);
+  text-align: center;
+}
+
+.playerLevel {
+  background: var(--accent);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 0 auto var(--space-sm);
+  border: 2px solid white;
+}
+
+.playerBadge {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 600;
+}
+
+.playerInfo {
+  text-align: center;
+}
+
+.playerInfo h3 {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-sm);
+  color: white;
+}
+
+.playerTag {
+  color: rgba(255,255,255,0.8);
+  margin-bottom: var(--space-md);
+  font-size: 0.9rem;
+}
+
+.playerStats {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  margin-top: var(--space-xs);
+}
+
+.dnaStats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.dnaMetric h4 {
+  margin-bottom: var(--space-sm);
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.dnaProgress {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  padding: var(--space-sm);
+  position: relative;
+}
+
+.progressFill {
+  height: 8px;
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+  position: relative;
+}
+
+.progressFill.explorer {
+  background: linear-gradient(90deg, #00ff88, #00ccff);
+}
+
+.progressFill.completionist {
+  background: linear-gradient(90deg, #ff6b6b, #ffa726);
+}
+
+.progressFill.hardcore {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.dnaProgress span {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .profileHeader {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--space-lg);
+  }
+  
+  .profileStats {
+    justify-content: center;
+  }
+  
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .dnaContainer {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+  
+  .playerAvatar {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .playerStats {
+    gap: var(--space-md);
+  }
+  
+  .statValue {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .profileInfo h2 {
+    font-size: 1.5rem;
+  }
+  
+  .pageHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .recentGame {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .gameMeta {
+    justify-content: center;
+  }
+}

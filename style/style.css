@@ -1,0 +1,1773 @@
+/* Reset и базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+:root {
+    --primary: #2c3e50;
+    --secondary: #3498db;
+    --accent: #e74c3c;
+    --light: #ecf0f1;
+    --dark: #2c3e50;
+    --success: #2ecc71;
+    --warning: #f39c12;
+    --gray: #95a5a6;
+    --border: #bdc3c7;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Шапка */
+.header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logo h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.logo span {
+    color: var(--accent);
+}
+
+.logo p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.nav ul {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.nav ul li a:hover,
+.nav ul li a.active {
+    background-color: rgba(255,255,255,0.1);
+}
+
+/* Секция фильтров */
+.filters-section {
+    background: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: var(--secondary);
+}
+
+.search-btn {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.search-btn:hover {
+    background: #2980b9;
+}
+
+.filters-container {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.filter-group h3 {
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-size: 1.1rem;
+}
+
+.filter-options {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filter-option {
+    position: relative;
+    cursor: pointer;
+}
+
+.filter-option input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--light);
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.filter-option input:checked + .checkmark {
+    background: var(--secondary);
+    color: white;
+    border-color: var(--secondary);
+}
+
+.sort-select {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    background: white;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Основной контент */
+.main-content {
+    padding: 2rem 0;
+}
+
+.featured-games,
+.new-games {
+    margin-bottom: 3rem;
+}
+
+.featured-games h2,
+.new-games h2 {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.featured-games h2::after,
+.new-games h2::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--accent);
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Карточка игры */
+.game-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.game-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.game-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.game-card:hover .game-image img {
+    transform: scale(1.05);
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--gray);
+    transition: all 0.3s;
+}
+
+.favorite-btn:hover,
+.favorite-btn.active {
+    background: var(--accent);
+    color: white;
+}
+
+.game-rating {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.game-info {
+    padding: 1.5rem;
+}
+
+.game-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.game-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.platform {
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.platform.pc {
+    background: #3498db;
+    color: white;
+}
+
+.platform.ps {
+    background: #003087;
+    color: white;
+}
+
+.platform.xbox {
+    background: #107c10;
+    color: white;
+}
+
+.game-genres {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.genre {
+    padding: 0.25rem 0.75rem;
+    background: var(--light);
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--dark);
+}
+
+.game-description {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.game-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+    flex: 1;
+    text-align: center;
+}
+
+.wishlist-btn {
+    background: var(--light);
+    color: var(--dark);
+}
+
+.wishlist-btn:hover {
+    background: var(--warning);
+    color: white;
+}
+
+.details-btn {
+    background: var(--secondary);
+    color: white;
+}
+
+.details-btn:hover {
+    background: #2980b9;
+}
+
+/* Подвал */
+.footer {
+    background: var(--dark);
+    color: white;
+    padding: 3rem 0 1rem;
+    margin-top: 3rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-section h3,
+.footer-section h4 {
+    margin-bottom: 1rem;
+    color: var(--light);
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+    color: var(--gray);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: white;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1rem;
+    text-align: center;
+    color: var(--gray);
+}
+
+/* ДНК-анализатор с аватаркой */
+.dna-analyzer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 0;
+    margin: 3rem 0;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.dna-analyzer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dnaPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dnaPattern)"/></svg>');
+}
+
+.dna-analyzer h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.dna-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+/* Аватар игрока */
+.dna-visualization {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.player-avatar {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+}
+
+.player-avatar:hover {
+    transform: scale(1.05);
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 1rem 0 0.5rem;
+    text-align: center;
+}
+
+.player-level {
+    background: var(--accent);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0 auto 0.5rem;
+    border: 2px solid white;
+}
+
+.player-badge {
+    font-size: 0.9rem;
+    color: white;
+    font-weight: 600;
+}
+
+.player-info {
+    text-align: center;
+}
+
+.player-info h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.player-tag {
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.player-stats {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 0.25rem;
+}
+
+/* Бейдж архетипа */
+.archetype-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.archetype-icon {
+    font-size: 1.5rem;
+}
+
+.archetype-name {
+    font-weight: 600;
+    color: white;
+}
+
+/* Статистика ДНК */
+.dna-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dna-metric h4 {
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.9);
+}
+
+.dna-progress {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 0.5rem;
+    position: relative;
+}
+
+.progress-fill {
+    height: 8px;
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+    position: relative;
+}
+
+.progress-fill.explorer {
+    background: linear-gradient(90deg, #00ff88, #00ccff);
+}
+
+.progress-fill.completionist {
+    background: linear-gradient(90deg, #ff6b6b, #ffa726);
+}
+
+.progress-fill.hardcore {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.dna-progress span {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Особенности ДНК-анализатора */
+.dna-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.dna-feature-card {
+    background: rgba(255,255,255,0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.3s ease;
+}
+
+.dna-feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.dna-feature-card h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.dna-feature-card p {
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+}
+
+/* Совместимость с играми */
+.dna-compatibility {
+    background: rgba(255,255,255,0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.dna-compatibility h3 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+}
+
+.compatibility-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.compat-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.game-name {
+    font-weight: 600;
+    color: white;
+}
+
+.compat-bar {
+    background: rgba(255,255,255,0.2);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.compat-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+.compat-fill.high {
+    background: linear-gradient(90deg, #00ff88, #00ccff);
+}
+
+.compat-fill.medium {
+    background: linear-gradient(90deg, #ffa726, #ff6b6b);
+}
+
+.compat-fill.low {
+    background: linear-gradient(90deg, #ff6b6b, #c2185b);
+}
+
+.compat-percent {
+    font-weight: 600;
+    color: white;
+    min-width: 3rem;
+    text-align: right;
+}
+
+/* Адаптивность для ДНК-анализатора */
+@media (max-width: 768px) {
+    .dna-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .player-avatar {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .player-stats {
+        gap: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .compat-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .dna-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .archetype-badge {
+        justify-content: center;
+    }
+}
+
+/* Анимации */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.player-avatar {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.dna-metric {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .nav ul {
+        gap: 1rem;
+    }
+
+    .filters-container {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .search-bar {
+        flex-direction: column;
+    }
+
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .game-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+    }
+
+    .nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-options {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.presentation-link {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: var(--accent);
+    color: white;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+}
+
+.presentation-link:hover {
+    background: #c0392b;
+}
+
+/* Страница избранного */
+.favorites-section {
+    padding: 2rem 0;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: var(--gray);
+    font-size: 1.1rem;
+}
+
+.favorites-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid var(--accent);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.game-card.featured {
+    position: relative;
+    border: 2px solid var(--accent);
+}
+
+.game-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--accent);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.compatibility-score {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    background: rgba(52, 152, 219, 0.1);
+    border-radius: 6px;
+}
+
+.compat-text {
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.compat-percent {
+    font-weight: bold;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    color: white;
+}
+
+.compat-percent.high {
+    background: var(--success);
+}
+
+.compat-percent.medium {
+    background: var(--warning);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: var(--gray);
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background: var(--secondary);
+    color: white;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+/* Детальная страница игры */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumbs a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
+.breadcrumbs .separator {
+    color: var(--gray);
+}
+
+.breadcrumbs .current {
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.game-hero {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.game-gallery .main-image {
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.main-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.image-thumbnails {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.thumb {
+    width: 100px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.thumb.active,
+.thumb:hover {
+    opacity: 1;
+    border: 2px solid var(--secondary);
+}
+
+.thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.game-sidebar {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.game-header h1 {
+    font-size: 2rem;
+    color: var(--primary);
+    margin: 0;
+}
+
+.game-actions-top {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.favorite-btn.large,
+.wishlist-btn.large {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.favorite-btn.large {
+    background: var(--accent);
+    color: white;
+}
+
+.wishlist-btn.large {
+    background: var(--light);
+    color: var(--dark);
+}
+
+.game-rating-large {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: 8px;
+}
+
+.rating-score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.rating-stars {
+    font-size: 1.2rem;
+    color: var(--warning);
+    margin: 0.5rem 0;
+}
+
+.rating-count {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.compatibility-badge {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, var(--success), #27ae60);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.compat-icon {
+    font-size: 2rem;
+}
+
+.compat-percent {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.compat-text {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.game-meta-detail {
+    margin-bottom: 1.5rem;
+}
+
+.meta-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.meta-item:last-child {
+    border-bottom: none;
+}
+
+.price-section {
+    text-align: center;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.price-old {
+    text-decoration: line-through;
+    color: var(--gray);
+    margin: 0.5rem 0;
+}
+
+.discount {
+    background: var(--accent);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.btn-buy {
+    background: var(--success);
+    color: white;
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-buy:hover {
+    background: #27ae60;
+}
+
+.game-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+}
+
+.content-main section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.content-main h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--light);
+    border-radius: 8px;
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.feature-item h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.requirements-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.req-tab {
+    padding: 0.75rem 1.5rem;
+    background: var(--light);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.req-tab.active {
+    background: var(--secondary);
+    color: white;
+}
+
+.req-specs {
+    display: none;
+}
+
+.req-specs.active {
+    display: block;
+}
+
+.spec-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.spec-item:last-child {
+    border-bottom: none;
+}
+
+.reviews-summary {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.summary-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: 8px;
+    flex: 1;
+}
+
+.summary-rating,
+.summary-percent {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.review-card {
+    background: var(--light);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.reviewer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.reviewer img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.reviewer-name {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.review-rating {
+    color: var(--warning);
+}
+
+.review-date {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.review-helpful {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-top: 1rem;
+}
+
+.sidebar-widget {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.sidebar-widget h3 {
+    color: var(--primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.similar-game {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.similar-game:last-child {
+    border-bottom: none;
+}
+
+.similar-game img {
+    width: 60px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.similar-info h4 {
+    font-size: 0.9rem;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.similar-rating {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.achievement {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.achievement:last-child {
+    border-bottom: none;
+}
+
+.achievement-icon {
+    font-size: 1.5rem;
+}
+
+.achievement-name {
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.achievement-desc {
+    color: var(--gray);
+    font-size: 0.8rem;
+    margin: 0.25rem 0;
+}
+
+.achievement-progress {
+    color: var(--secondary);
+    font-size: 0.7rem;
+}
+
+/* Адаптивность для новых страниц */
+@media (max-width: 768px) {
+    .game-hero,
+    .game-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .favorites-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .reviews-summary {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .image-thumbnails {
+        justify-content: center;
+    }
+}
+
+/* Страница профиля */
+.profile-section {
+    padding: 2rem 0;
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.profile-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.profile-avatar {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--secondary);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.avatar-status.online {
+    background: var(--success);
+}
+
+.profile-info h2 {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.profile-tag {
+    color: var(--gray);
+    margin-bottom: 1rem;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.profile-stat {
+    text-align: center;
+}
+
+.profile-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    display: block;
+}
+
+.profile-stat .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.btn-edit {
+    background: var(--light);
+    color: var(--dark);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+/* Форма добавления игры */
+.add-game-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.game-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+}
+
+.rating-input {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rating-input label {
+    font-weight: 600;
+    color: var(--dark);
+    min-width: 120px;
+}
+
+.stars {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.star {
+    font-size: 2rem;
+    color: #bdc3c7;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.star:hover {
+    color: #f39c12;
+}
+
+.rating-value {
+    font-weight: 600;
+    color: var(--dark);
+    min-width: 40px;
+}
+
+.playtime-input,
+.completion-input {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.playtime-input label,
+.completion-input label {
+    font-weight: 600;
+    color: var(--dark);
+    min-width: 120px;
+}
+
+.playtime-input input {
+    padding: 0.5rem;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    width: 100px;
+}
+
+.completion-input {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.completion-input input[type="range"] {
+    flex: 1;
+}
+
+#completionValue {
+    font-weight: 600;
+    color: var(--primary);
+    min-width: 50px;
+}
+
+/* Статистика игр */
+.games-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: 8px;
+}
+
+.stat-icon {
+    font-size: 2rem;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.stat-label {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+/* Недавние игры */
+.recent-games {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.recent-game {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.recent-game:hover {
+    background: #e0e0e0;
+}
+
+.recent-game img {
+    width: 60px;
+    height: 80px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.game-details h4 {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.game-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+}
+
+.game-meta .rating {
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.game-meta .playtime {
+    color: var(--secondary);
+}
+
+.game-meta .completion {
+    color: var(--success);
+}
+
+/* Адаптивность профиля */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .btn-edit {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+
+    .profile-stats {
+        justify-content: center;
+    }
+
+    .games-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .rating-input,
+    .playtime-input,
+    .completion-input {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .rating-input label,
+    .playtime-input label,
+    .completion-input label {
+        min-width: auto;
+    }
+}

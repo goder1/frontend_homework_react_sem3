@@ -1,0 +1,37 @@
+.homePage {
+  min-height: calc(100vh - 200px);
+}
+
+.mainContent {
+  padding: var(--space-xl) 0;
+}
+
+.featuredGames,
+.newGames {
+  margin-bottom: var(--space-2xl);
+}
+
+.featuredGames h2,
+.newGames h2 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.featuredGames h2::after,
+.newGames h2::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--accent);
+}
+
+.gamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-xl);
+}

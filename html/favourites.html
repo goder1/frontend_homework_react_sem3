@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Избранное - GameCatalog</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <a href="../presentation/index.html" class="presentation-link">📊 Презентация</a>
+    
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Game<span>Catalog</span></h1>
+                    <p>Ваш гид в мире видеоигр</p>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="../index.html">Каталог</a></li>
+                        <li><a href="#" class="active">Избранное</a></li>
+                        <li><a href="#">Желаемое</a></li>
+                        <li><a href="profile.html">Профиль</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="favorites-section">
+                <div class="page-header">
+                    <h1>❤️ Избранные игры</h1>
+                    <p>Ваша личная коллекция самых любимых игр</p>
+                </div>
+
+                <div class="favorites-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Игры в избранном</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">4.55</div>
+                        <div class="stat-label">Средний рейтинг</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">85%</div>
+                        <div class="stat-label">Совпадение с профилем</div>
+                    </div>
+                </div>
+
+                <div class="games-grid">
+                    <!-- Elden Ring -->
+                    <div class="game-card featured">
+                        <div class="game-badge">ТОП ИЗБРАННОЕ</div>
+                        <div class="game-image">
+                            <img src="../images/elden.webp" alt="Elden Ring">
+                            <button class="favorite-btn active" data-game="2">♥</button>
+                            <div class="game-rating">4.8</div>
+                        </div>
+                        <div class="game-info">
+                            <h3>Elden Ring</h3>
+                            <div class="game-meta">
+                                <span class="platform pc">PC</span>
+                                <span class="platform ps">PS5</span>
+                                <span class="platform xbox">Xbox</span>
+                            </div>
+                            <div class="game-genres">
+                                <span class="genre">RPG</span>
+                                <span class="genre">Action</span>
+                                <span class="genre">Souls-like</span>
+                            </div>
+                            <p class="game-description">Фэнтезийная action-RPG от создателей Dark Souls.</p>
+                            <div class="compatibility-score">
+                                <span class="compat-text">Совместимость с вами:</span>
+                                <span class="compat-percent high">92%</span>
+                            </div>
+                            <div class="game-actions">
+                                <button class="btn wishlist-btn">В желаемое</button>
+                                <a href="../html/game.html" class="btn details-btn">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Halo Infinite -->
+                    <div class="game-card">
+                        <div class="game-image">
+                            <img src="../images/halo.jpg" alt="Halo Infinite">
+                            <button class="favorite-btn active" data-game="5">♥</button>
+                            <div class="game-rating">4.3</div>
+                        </div>
+                        <div class="game-info">
+                            <h3>Halo Infinite</h3>
+                            <div class="game-meta">
+                                <span class="platform pc">PC</span>
+                                <span class="platform xbox">Xbox</span>
+                            </div>
+                            <div class="game-genres">
+                                <span class="genre">Action</span>
+                                <span class="genre">FPS</span>
+                                <span class="genre">Sci-Fi</span>
+                            </div>
+                            <p class="game-description">Возвращение легендарного Мастера Чифа.</p>
+                            <div class="compatibility-score">
+                                <span class="compat-text">Совместимость с вами:</span>
+                                <span class="compat-percent medium">78%</span>
+                            </div>
+                            <div class="game-actions">
+                                <button class="btn wishlist-btn">В желаемое</button>
+                                <button class="btn details-btn">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="empty-state" id="emptyFavorites" style="display: none;">
+                    <div class="empty-icon">❤️</div>
+                    <h3>В избранном пока пусто</h3>
+                    <p>Добавляйте игры в избранное, чтобы легко находить их позже</p>
+                    <a href="index.html" class="btn btn-primary">Найти игры</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>GameCatalog</h3>
+                    <p>Лучший каталог видеоигр для настоящих геймеров</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Категории</h4>
+                    <ul>
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">RPG</a></li>
+                        <li><a href="#">Strategy</a></li>
+                        <li><a href="#">Adventure</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Платформы</h4>
+                    <ul>
+                        <li><a href="#">PC</a></li>
+                        <li><a href="#">PlayStation</a></li>
+                        <li><a href="#">Xbox</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GameCatalog. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

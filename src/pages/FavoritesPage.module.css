@@ -1,0 +1,241 @@
+.favoritesPage {
+  padding: var(--space-xl) 0;
+  min-height: calc(100vh - 300px);
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.pageHeader h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.pageHeader p {
+  color: var(--gray);
+  font-size: 1.1rem;
+}
+
+.favoritesStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.statCard {
+  background: white;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+  border-left: 4px solid var(--accent);
+}
+
+.statNumber {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+}
+
+.statLabel {
+  color: var(--gray);
+  font-size: 0.9rem;
+}
+
+.clearBtn {
+  background: none;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  margin-top: var(--space-md);
+}
+
+.clearBtn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-xl);
+}
+
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.sortControl label {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.sortSelect {
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.gamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-xl);
+  margin-bottom: var(--space-2xl);
+}
+
+.gameCardWrapper {
+  position: relative;
+}
+
+.gameBadge {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  background: var(--warning);
+  color: white;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-2xl);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--space-2xl) 0;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  margin-bottom: var(--space-lg);
+}
+
+.emptyState h3 {
+  color: var(--primary);
+  margin-bottom: var(--space-md);
+}
+
+.emptyState p {
+  color: var(--gray);
+  margin-bottom: var(--space-xl);
+}
+
+.compatibilitySection {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.compatibilitySection h3 {
+  color: var(--primary);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.compatibilityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.compatItem {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+}
+
+.gameName {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.compatBar {
+  background: rgba(0, 0, 0, 0.1);
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.compatFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+}
+
+.compatFill.high {
+  background: linear-gradient(90deg, #00ff88, #00ccff);
+}
+
+.compatFill.medium {
+  background: linear-gradient(90deg, #ffa726, #ff6b6b);
+}
+
+.compatFill.low {
+  background: linear-gradient(90deg, #ff6b6b, #c2185b);
+}
+
+.compatPercent {
+  font-weight: 600;
+  color: var(--primary);
+  min-width: 3rem;
+  text-align: right;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .favoritesStats {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .compatItem {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: var(--space-sm);
+  }
+  
+  .controls {
+    justify-content: center;
+  }
+  
+  .sortControl {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .favoritesStats {
+    grid-template-columns: 1fr;
+  }
+  
+  .pageHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .gamesGrid {
+    grid-template-columns: 1fr;
+  }
+}

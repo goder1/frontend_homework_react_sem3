@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elden Ring - GameCatalog</title>
+    <link rel="stylesheet" href="../style/style.css">
+</head>
+<body>
+    <a href="html/index.html" class="presentation-link">📊 Презентация</a>
+    
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Game<span>Catalog</span></h1>
+                    <p>Ваш гид в мире видеоигр</p>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="../index.html">Каталог</a></li>
+                        <li><a href="favourites.html">Избранное</a></li>
+                        <li><a href="#">Желаемое</a></li>
+                        <li><a href="profile.html">Профиль</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Хлебные крошки -->
+            <nav class="breadcrumbs">
+                <a href="../index.html">Каталог</a>
+                <span class="separator">/</span>
+                <a href="#">RPG</a>
+                <span class="separator">/</span>
+                <span class="current">Elden Ring</span>
+            </nav>
+
+            <section class="game-detail">
+                <div class="game-hero">
+                    <div class="game-gallery">
+                        <div class="main-image">
+                            <img src="../images/elden.webp" alt="Elden Ring">
+                        </div>
+                        <div class="image-thumbnails">
+                            <div class="thumb active"><img src="../images/elden.webp" alt="Elden Ring 1"></div>
+                            <div class="thumb"><img src="../images/elden.webp" alt="Elden Ring 2"></div>
+                            <div class="thumb"><img src="../images/elden.webp" alt="Elden Ring 3"></div>
+                            <div class="thumb"><img src="../images/elden.webp" alt="Elden Ring 4"></div>
+                        </div>
+                    </div>
+
+                    <div class="game-sidebar">
+                        <div class="game-header">
+                            <h1>Elden Ring</h1>
+                            <div class="game-actions-top">
+                                <button class="favorite-btn large active">♥</button>
+                            </div>
+                        </div>
+
+                        <div class="game-rating-large">
+                            <div class="rating-score">4.8</div>
+                            <div class="rating-stars">★★★★★</div>
+                            <div class="rating-count">12,847 оценок</div>
+                        </div>
+
+                        <div class="compatibility-badge">
+                            <div class="compat-icon">🎯</div>
+                            <div class="compat-info">
+                                <div class="compat-percent">92%</div>
+                                <div class="compat-text">Совместимость с вами</div>
+                            </div>
+                        </div>
+
+                        <div class="game-meta-detail">
+                            <div class="meta-item">
+                                <strong>Разработчик:</strong>
+                                <span>FromSoftware</span>
+                            </div>
+                            <div class="meta-item">
+                                <strong>Издатель:</strong>
+                                <span>Bandai Namco</span>
+                            </div>
+                            <div class="meta-item">
+                                <strong>Дата выхода:</strong>
+                                <span>25 февраля 2022</span>
+                            </div>
+                            <div class="meta-item">
+                                <strong>Платформы:</strong>
+                                <div class="platforms">
+                                    <span class="platform pc">PC</span>
+                                    <span class="platform ps">PS5</span>
+                                    <span class="platform xbox">Xbox</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="price-section">
+                            <div class="price">3,999 ₽</div>
+                            <div class="price-old">4,599 ₽</div>
+                            <div class="discount">-13%</div>
+                            <button class="btn btn-buy">Купить сейчас</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-content">
+                    <div class="content-main">
+                        <section class="game-description-section">
+                            <h2>Об игре</h2>
+                            <p>Elden Ring — фэнтезийная action-RPG, разработанная студией FromSoftware в сотрудничестве с Джорджем Р. Р. Мартином. Вас ждет огромный открытый мир, наполненный тайнами, опасностями и невероятными приключениями.</p>
+                            <p>Сражайтесь с легендарными боссами, исследуйте древние руины и создайте своего уникального персонажа в мире, где каждый уголок хранит свою историю.</p>
+                        </section>
+
+                        <section class="requirements-section">
+                            <h2>Системные требования</h2>
+                            <div class="requirements-tabs">
+                                <button class="req-tab active" data-tab="minimal">Минимальные</button>
+                                <button class="req-tab" data-tab="recommended">Рекомендуемые</button>
+                            </div>
+                            <div class="requirements-content">
+                                <div class="req-specs active" id="minimal">
+                                    <div class="spec-item">
+                                        <strong>ОС:</strong> Windows 10
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Процессор:</strong> Intel Core i5-8400 / AMD Ryzen 3 3300X
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Память:</strong> 12 GB ОЗУ
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Видеокарта:</strong> NVIDIA GeForce GTX 1060 / AMD Radeon RX 580
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>DirectX:</strong> Версии 12
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Место на диске:</strong> 60 GB
+                                    </div>
+                                </div>
+                                <div class="req-specs" id="recommended">
+                                    <div class="spec-item">
+                                        <strong>ОС:</strong> Windows 10/11
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Процессор:</strong> Intel Core i7-8700K / AMD Ryzen 5 3600X
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Память:</strong> 16 GB ОЗУ
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Видеокарта:</strong> NVIDIA GeForce RTX 2070 / AMD Radeon RX 6700 XT
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>DirectX:</strong> Версии 12
+                                    </div>
+                                    <div class="spec-item">
+                                        <strong>Место на диске:</strong> 60 GB
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>GameCatalog</h3>
+                    <p>Лучший каталог видеоигр для настоящих геймеров</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Категории</h4>
+                    <ul>
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">RPG</a></li>
+                        <li><a href="#">Strategy</a></li>
+                        <li><a href="#">Adventure</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Платформы</h4>
+                    <ul>
+                        <li><a href="#">PC</a></li>
+                        <li><a href="#">PlayStation</a></li>
+                        <li><a href="#">Xbox</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 GameCatalog. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
