@@ -12,7 +12,7 @@ export default defineConfig({
       '@services': path.resolve(__dirname, './src/services')
     }
   },
-  base: '/frontend_homework_react_sem3/',
+  base: '/',
   server: {
     port: 3000,
     open: true

@@ -1,22 +1,32 @@
+// src/components/games/GameCard.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Добавьте этот импорт
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { selectIsFavorite, toggleFavoriteSync } from '../../store/slices/favoritesSlice';
 import { Game } from '../../types/game';
 import styles from './GameCard.module.css';
 
 interface GameCardProps {
   game: Game;
-  onToggleFavorite: (id: number) => void;
-  onAddToWishlist: (id: number) => void;
   onViewDetails?: (id: number) => void; // Сделаем опциональным
 }
 
 const GameCard: React.FC<GameCardProps> = ({
   game,
-  onToggleFavorite,
-  onAddToWishlist,
   onViewDetails,
 }) => {
-  const navigate = useNavigate(); // Хук для навигации
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  
+  // Получаем состояние избранного из Redux
+  const isFavorite = useAppSelector(selectIsFavorite(game.id));
+
+  const handleToggleFavorite = () => {
+    dispatch(toggleFavoriteSync({ 
+      game, 
+      isFavorite 
+    }));
+  };
 
   const handleViewDetails = () => {
     // Если передана кастомная функция - используем её
@@ -33,9 +43,9 @@ const GameCard: React.FC<GameCardProps> = ({
       <div className={styles.gameImage}>
         <img src={game.imageUrl} alt={game.title} />
         <button
-          className={`${styles.favoriteBtn} ${game.isFavorite ? styles.active : ''}`}
-          onClick={() => onToggleFavorite(game.id)}
-          aria-label={game.isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
+          className={`${styles.favoriteBtn} ${isFavorite ? styles.active : ''}`}
+          onClick={handleToggleFavorite}
+          aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
         >
           ♥
         </button>
@@ -67,12 +77,6 @@ const GameCard: React.FC<GameCardProps> = ({
         <p className={styles.gameDescription}>{game.description}</p>
         
         <div className={styles.gameActions}>
-          <button
-            className={`${styles.btn} ${styles.wishlistBtn} ${game.isInWishlist ? styles.inWishlist : ''}`}
-            onClick={() => onAddToWishlist(game.id)}
-          >
-            {game.isInWishlist ? 'В желаемом' : 'Добавить в желаемое'}
-          </button>
           <button
             className={`${styles.btn} ${styles.detailsBtn}`}
             onClick={handleViewDetails}

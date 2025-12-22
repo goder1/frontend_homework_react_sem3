@@ -1,3 +1,5 @@
+/* src/pages/GameDetailsPage.module.css */
+
 .gameDetailsPage {
   padding: var(--space-xl) 0;
   min-height: calc(100vh - 300px);
@@ -25,15 +27,30 @@
   font-weight: 600;
 }
 
-.gameHero {
+/* Новая структура */
+.gameLayout {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--space-2xl);
-  margin-bottom: var(--space-2xl);
+}
+
+/* Левая колонка - основное содержимое */
+.gameMainContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Галерея */
+.gameGallery {
+  background: white;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .gameGallery .mainImage {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
   margin-bottom: var(--space-md);
 }
@@ -71,12 +88,29 @@
   object-fit: cover;
 }
 
+/* Блоки описания и требований */
+.contentSection {
+  background: white;
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.contentSection h2 {
+  color: var(--primary);
+  margin-bottom: var(--space-lg);
+  font-size: 1.5rem;
+}
+
+/* Правая колонка - информация об игре */
 .gameSidebar {
   background: white;
   padding: var(--space-xl);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   height: fit-content;
+  position: sticky;
+  top: 20px;
 }
 
 .gameHeader {
@@ -267,49 +301,7 @@
   background: #27ae60;
 }
 
-.gameContent {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: var(--space-2xl);
-}
-
-.contentMain section {
-  background: white;
-  padding: var(--space-xl);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  margin-bottom: var(--space-xl);
-}
-
-.contentMain h2 {
-  color: var(--primary);
-  margin-bottom: var(--space-lg);
-  font-size: 1.5rem;
-}
-
-.featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-lg);
-}
-
-.featureItem {
-  text-align: center;
-  padding: var(--space-lg);
-  background: var(--light);
-  border-radius: var(--radius-md);
-}
-
-.featureIcon {
-  font-size: 2.5rem;
-  margin-bottom: var(--space-md);
-}
-
-.featureItem h4 {
-  color: var(--primary);
-  margin-bottom: var(--space-sm);
-}
-
+/* Системные требования */
 .requirementsTabs {
   display: flex;
   gap: var(--space-md);
@@ -347,88 +339,6 @@
   border-bottom: none;
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
-.sidebarWidget {
-  background: white;
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-}
-
-.sidebarWidget h3 {
-  color: var(--primary);
-  margin-bottom: var(--space-md);
-  font-size: 1.2rem;
-}
-
-.similarGame {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.similarGame:last-child {
-  border-bottom: none;
-}
-
-.similarGame img {
-  width: 60px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-}
-
-.similarInfo h4 {
-  font-size: 0.9rem;
-  color: var(--primary);
-  margin-bottom: var(--space-xs);
-}
-
-.similarRating {
-  color: var(--warning);
-  font-weight: 600;
-}
-
-.achievement {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.achievement:last-child {
-  border-bottom: none;
-}
-
-.achievementIcon {
-  font-size: 1.5rem;
-}
-
-.achievementName {
-  font-weight: 600;
-  color: var(--primary);
-  font-size: 0.9rem;
-}
-
-.achievementDesc {
-  color: var(--gray);
-  font-size: 0.8rem;
-  margin: var(--space-xs) 0;
-}
-
-.achievementProgress {
-  color: var(--secondary);
-  font-size: 0.7rem;
-}
-
 .loading, .notFound {
   display: flex;
   flex-direction: column;
@@ -461,13 +371,14 @@
 
 /* Адаптивность */
 @media (max-width: 768px) {
-  .gameHero,
-  .gameContent {
+  .gameLayout {
     grid-template-columns: 1fr;
+    gap: var(--space-xl);
   }
   
-  .featuresGrid {
-    grid-template-columns: 1fr;
+  .gameSidebar {
+    position: static;
+    order: -1; /* Перемещаем боковую панель наверх на мобильных */
   }
   
   .gameHeader {
@@ -500,9 +411,38 @@
   .ratingScore {
     font-size: 2rem;
   }
-  
-  .similarGame {
-    flex-direction: column;
-    text-align: center;
-  }
+}
+
+.gameActionsTop {
+  display: flex;
+  gap: 0; /* Убираем gap, так как кнопка одна */
+}
+
+/* Оставляем только стили для favoriteBtn, убираем wishlistBtn */
+.favoriteBtn.large {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s;
+  background: var(--light);
+  color: var(--dark);
+}
+
+.favoriteBtn.large:hover {
+  background: #dfe6e9;
+}
+
+.favoriteBtn.large.active {
+  background: var(--accent);
+  color: white;
+}
+
+.favoriteBtn.large.active:hover {
+  background: #c0392b;
 }

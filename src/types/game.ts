@@ -7,7 +7,6 @@ export interface Game {
   genres: string[];
   imageUrl: string;
   isFavorite: boolean;
-  isInWishlist: boolean;
   releaseDate: string;
 }
 

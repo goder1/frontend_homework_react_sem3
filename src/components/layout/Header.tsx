@@ -1,50 +1,51 @@
+// src/components/layout/Header.tsx
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { useAppSelector } from '../../store/hooks';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {
+  const user = useAppSelector(selectCurrentUser);
+
   return (
     <header className={styles.header}>
       <div className="container">
         <div className={styles.headerContent}>
-          <div className={styles.logo}>
-            <Link to="/">
-              <h1>Game<span>Catalog</span></h1>
-              <p>Ваш гид в мире видеоигр</p>
-            </Link>
-          </div>
-          
+          <Link to="/" className={styles.logo}>
+            <h1>Game<span>Catalog</span></h1>
+            <p className={styles.tagline}>Ваш гид в мире видеоигр</p>
+          </Link>
+
           <nav className={styles.nav}>
-            <ul>
+            <ul className={styles.navList}>
               <li>
                 <NavLink 
                   to="/" 
+                  className={({ isActive }) => 
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
+                  }
                   end
-                  className={({ isActive }) => isActive ? styles.active : ''}
                 >
                   Каталог
                 </NavLink>
               </li>
               <li>
                 <NavLink 
-                  to="/favorites"
-                  className={({ isActive }) => isActive ? styles.active : ''}
+                  to="/favorites" 
+                  className={({ isActive }) => 
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
+                  }
                 >
                   Избранное
                 </NavLink>
               </li>
               <li>
                 <NavLink 
-                  to="/wishlist"
-                  className={({ isActive }) => isActive ? styles.active : ''}
-                >
-                  Желаемое
-                </NavLink>
-              </li>
-              <li>
-                <NavLink 
-                  to="/profile"
-                  className={({ isActive }) => isActive ? styles.active : ''}
+                  to="/profile" 
+                  className={({ isActive }) => 
+                    `${styles.navLink} ${isActive ? styles.active : ''}`
+                  }
                 >
                   Профиль
                 </NavLink>

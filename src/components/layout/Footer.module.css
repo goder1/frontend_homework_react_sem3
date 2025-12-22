@@ -42,3 +42,19 @@
   text-align: center;
   color: var(--gray);
 }
+
+/* Добавьте эти стили в Footer.module.css */
+.footerLink {
+  background: none;
+  border: none;
+  color: var(--gray);
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.footerLink:hover {
+  text-decoration: none;
+  color: var(--white);
+}

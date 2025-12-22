@@ -73,7 +73,7 @@
   width: 0;
 }
 
-.checkmark {
+.checkMark {
   display: inline-block;
   padding: 0.5rem 1rem;
   background: var(--light);
@@ -85,13 +85,13 @@
   text-align: center;
 }
 
-.filterOption input:checked + .checkmark {
+.filterOption input:checked + .checkMark {
   background: var(--secondary);
   color: white;
   border-color: var(--secondary);
 }
 
-.filterOption:hover input:not(:checked) + .checkmark {
+.filterOption:hover input:not(:checked) + .checkMark {
   background: #e8f4fc;
   border-color: var(--secondary);
 }
@@ -125,5 +125,165 @@
   
   .sortSelect {
     min-width: 100%;
+  }
+}
+
+/* Альтернативный вариант с вашими CSS переменными */
+.filtersContainer {
+  background: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.filtersContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.searchSection {
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--secondary);
+}
+
+.filtersSections {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.filterSection {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterSection h4 {
+  margin-bottom: 1rem;
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.platformsGrid, .genresGrid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.platformBtn, .genreBtn {
+  padding: 0.5rem 1rem;
+  background: var(--light);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.3s;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.platformBtn:hover, .genreBtn:hover {
+  background: #e8f4fc;
+  border-color: var(--secondary);
+}
+
+.platformBtn.active {
+  background: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+.genreBtn.active {
+  background: #2ecc71;
+  color: white;
+  border-color: #2ecc71;
+}
+
+.sortOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sortBtn {
+  padding: 0.5rem 1rem;
+  background: var(--light);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.3s;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sortBtn:hover {
+  background: #e8f4fc;
+  border-color: var(--secondary);
+}
+
+.sortBtn.active {
+  background: #9b59b6;
+  color: white;
+  border-color: #9b59b6;
+}
+
+.filterActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.resetBtn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.resetBtn:hover {
+  background: #c0392b;
+}
+
+.activeFilters {
+  display: flex;
+  gap: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.activeFilters span {
+  background-color: #f5f5f5;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .filtersSections {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .filterActions {
+    flex-direction: column;
+    gap: 1rem;
   }
 }

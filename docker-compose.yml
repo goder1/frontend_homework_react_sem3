@@ -1,0 +1,65 @@
+services:
+  supabase-db:
+    image: supabase/postgres:15.8.1.085
+    container_name: gamecatalog-supabase-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"      # Postgres
+    volumes:
+      - ./docker/postgres/01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./docker/postgres/02-create-tables.sql:/docker-entrypoint-initdb.d/02-create-tables.sql
+      - ./docker/postgres/03-seed-data.sql:/docker-entrypoint-initdb.d/03-seed-data.sql
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - gamecatalog-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U supabase_admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Supabase Studio (веб-интерфейс)
+  supabase-studio:
+    image: supabase/studio:latest
+    container_name: gamecatalog-supabase-studio
+    restart: unless-stopped
+    environment:
+      STUDIO_PG_META_URL: http://kong:8000
+      POSTGRES_URL: postgresql://postgres:${DB_PASSWORD:-supabase_local_password_123}@supabase:5432/postgres
+    ports:
+      - "8080:3000"
+    networks:
+      - gamecatalog-network
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+        
+    
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: gamecatalog-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@gamecatalog.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+    networks:
+      - gamecatalog-network
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+networks:
+  gamecatalog-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:

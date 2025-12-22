@@ -1,128 +1,160 @@
-import React, { useState } from 'react';
+// src/components/games/GameFilters.tsx
+import React from 'react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { 
+  updateFilters, 
+  resetFilters,
+  selectGamesFilters,
+  selectAllGenres,
+  selectAllPlatforms 
+} from '../../store/slices/gamesSlice';
 import { FilterState, Platform } from '../../types/game';
 import styles from './GameFilters.module.css';
 
 interface GameFiltersProps {
-  onFilterChange: (filters: FilterState) => void;
+  onFilterChange?: (filters: FilterState) => void;
 }
 
-const platforms: Platform[] = ['PC', 'PS5', 'Xbox'];
-const genres = ['Action', 'RPG', 'Strategy', 'Adventure', 'FPS', 'Sci-Fi', 'Fantasy', 'Indie'];
-
 const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
-  const [search, setSearch] = useState('');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<FilterState['sortBy']>('popular');
+  const dispatch = useAppDispatch();
+  const filters = useAppSelector(selectGamesFilters);
+  const allGenres = useAppSelector(selectAllGenres);
+  const allPlatforms = useAppSelector(selectAllPlatforms);
 
   const handlePlatformToggle = (platform: Platform) => {
-    const newPlatforms = selectedPlatforms.includes(platform)
-      ? selectedPlatforms.filter(p => p !== platform)
-      : [...selectedPlatforms, platform];
+    const newPlatforms = filters.platforms.includes(platform)
+      ? filters.platforms.filter(p => p !== platform)
+      : [...filters.platforms, platform];
     
-    setSelectedPlatforms(newPlatforms);
-    onFilterChange({
-      platforms: newPlatforms,
-      genres: selectedGenres,
-      sortBy,
-      searchQuery: search,
-    });
+    dispatch(updateFilters({ platforms: newPlatforms }));
+    onFilterChange?.({ ...filters, platforms: newPlatforms });
   };
 
   const handleGenreToggle = (genre: string) => {
-    const newGenres = selectedGenres.includes(genre)
-      ? selectedGenres.filter(g => g !== genre)
-      : [...selectedGenres, genre];
+    const newGenres = filters.genres.includes(genre)
+      ? filters.genres.filter(g => g !== genre)
+      : [...filters.genres, genre];
     
-    setSelectedGenres(newGenres);
-    onFilterChange({
-      platforms: selectedPlatforms,
-      genres: newGenres,
-      sortBy,
-      searchQuery: search,
-    });
+    dispatch(updateFilters({ genres: newGenres }));
+    onFilterChange?.({ ...filters, genres: newGenres });
   };
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    onFilterChange({
-      platforms: selectedPlatforms,
-      genres: selectedGenres,
-      sortBy,
-      searchQuery: value,
-    });
+  const handleSortChange = (sortBy: FilterState['sortBy']) => {
+    dispatch(updateFilters({ sortBy }));
+    onFilterChange?.({ ...filters, sortBy });
   };
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as FilterState['sortBy'];
-    setSortBy(value);
-    onFilterChange({
-      platforms: selectedPlatforms,
-      genres: selectedGenres,
-      sortBy: value,
-      searchQuery: search,
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(updateFilters({ searchQuery: e.target.value }));
+    onFilterChange?.({ ...filters, searchQuery: e.target.value });
+  };
+
+  const handleReset = () => {
+    dispatch(resetFilters());
+    onFilterChange?.({
+      platforms: [],
+      genres: [],
+      sortBy: 'popular',
+      searchQuery: '',
     });
   };
 
   return (
-    <section className={styles.filtersSection}>
+    <div className={styles.filtersContainer}>
       <div className="container">
-        <div className={styles.searchBar}>
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearch}
-            placeholder="Поиск игр по названию..."
-          />
-          <button className={styles.searchBtn}>Найти</button>
-        </div>
-        
-        <div className={styles.filtersContainer}>
-          <div className={styles.filterGroup}>
-            <h3>Платформа</h3>
-            <div className={styles.filterOptions}>
-              {platforms.map((platform) => (
-                <label key={platform} className={styles.filterOption}>
-                  <input
-                    type="checkbox"
-                    checked={selectedPlatforms.includes(platform)}
-                    onChange={() => handlePlatformToggle(platform)}
-                  />
-                  <span className={styles.checkMark}>{platform}</span>
-                </label>
-              ))}
+        <div className={styles.filtersContent}>
+          <div className={styles.searchSection}>
+            <input
+              type="text"
+              value={filters.searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Поиск игр по названию, описанию или жанру..."
+              className={styles.searchInput}
+            />
+          </div>
+
+          <div className={styles.filtersSections}>
+            <div className={styles.filterSection}>
+              <h4>Платформы</h4>
+              <div className={styles.platformsGrid}>
+                {allPlatforms.map((platform) => (
+                  <button
+                    key={platform}
+                    className={`${styles.platformBtn} ${
+                      filters.platforms.includes(platform as Platform) ? styles.active : ''
+                    }`}
+                    onClick={() => handlePlatformToggle(platform as Platform)}
+                  >
+                    {platform}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.filterSection}>
+              <h4>Жанры</h4>
+              <div className={styles.genresGrid}>
+                {allGenres.map((genre) => (
+                  <button
+                    key={genre}
+                    className={`${styles.genreBtn} ${
+                      filters.genres.includes(genre) ? styles.active : ''
+                    }`}
+                    onClick={() => handleGenreToggle(genre)}
+                  >
+                    {genre}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.filterSection}>
+              <h4>Сортировка</h4>
+              <div className={styles.sortOptions}>
+                <button
+                  className={`${styles.sortBtn} ${filters.sortBy === 'popular' ? styles.active : ''}`}
+                  onClick={() => handleSortChange('popular')}
+                >
+                  Популярные
+                </button>
+                <button
+                  className={`${styles.sortBtn} ${filters.sortBy === 'rating' ? styles.active : ''}`}
+                  onClick={() => handleSortChange('rating')}
+                >
+                  По рейтингу
+                </button>
+                <button
+                  className={`${styles.sortBtn} ${filters.sortBy === 'newest' ? styles.active : ''}`}
+                  onClick={() => handleSortChange('newest')}
+                >
+                  Новинки
+                </button>
+                <button
+                  className={`${styles.sortBtn} ${filters.sortBy === 'release' ? styles.active : ''}`}
+                  onClick={() => handleSortChange('release')}
+                >
+                  Дате выхода
+                </button>
+              </div>
             </div>
           </div>
-          
-          <div className={styles.filterGroup}>
-            <h3>Жанр</h3>
-            <div className={styles.filterOptions}>
-              {genres.map((genre) => (
-                <label key={genre} className={styles.filterOption}>
-                  <input
-                    type="checkbox"
-                    checked={selectedGenres.includes(genre)}
-                    onChange={() => handleGenreToggle(genre)}
-                  />
-                  <span className={styles.checkMark}>{genre}</span>
-                </label>
-              ))}
+
+          <div className={styles.filterActions}>
+            <button onClick={handleReset} className={styles.resetBtn}>
+              Сбросить фильтры
+            </button>
+            <div className={styles.activeFilters}>
+              {filters.platforms.length > 0 && (
+                <span>Платформы: {filters.platforms.join(', ')}</span>
+              )}
+              {filters.genres.length > 0 && (
+                <span>Жанры: {filters.genres.join(', ')}</span>
+              )}
             </div>
-          </div>
-          
-          <div className={styles.filterGroup}>
-            <h3>Сортировка</h3>
-            <select value={sortBy} onChange={handleSortChange} className={styles.sortSelect}>
-              <option value="popular">По популярности</option>
-              <option value="newest">Сначала новые</option>
-              <option value="rating">По рейтингу</option>
-              <option value="release">По дате выхода</option>
-            </select>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

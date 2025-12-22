@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "GameCatalog Supabase DB",
+            "Group": "Servers",
+            "Host": "supabase-db",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "supabase_admin",
+            "PassFile": "/pgpass",
+            "SSLMode": "prefer"
+        }
+    }
+}
