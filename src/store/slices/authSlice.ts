@@ -273,10 +273,20 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.isInitialized = true;
+        state.error = null;
+
+        // Очищаем localStorage
+        try {
+          localStorage.removeItem('authState');
+        } catch (err) {
+          console.error('Error clearing auth state:', err);
+        }
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        state.isInitialized = true;
       })
       
       // updateUserProfile

@@ -28,13 +28,25 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const isInitialized = useAppSelector(selectIsInitialized);
   const isAuthenticated = !!currentUser;
   
+  console.log('ProtectedRoute debug:', {
+    currentUser,
+    isLoading,
+    isInitialized,
+    isAuthenticated,
+    requireAuth,
+    pathname: location.pathname,
+  });
+  
   useEffect(() => {
-    if (!isInitialized) {
+    // Проверяем авторизацию при монтировании, если еще не инициализировано
+    if (!isInitialized && !isLoading) {
+      console.log('ProtectedRoute: Checking auth...');
       dispatch(checkAuth());
     }
-  }, [dispatch, isInitialized]);
+  }, [dispatch, isInitialized, isLoading]);
   
-  if (!isInitialized || isLoading) {
+  // Пока идет проверка авторизации
+  if (isLoading || !isInitialized) {
     return (
       <div className="loading-container">
         <div className="loading-spinner"></div>
@@ -43,14 +55,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
   
+  // Требуется авторизация, но пользователь не авторизован
   if (requireAuth && !isAuthenticated) {
+    console.log('ProtectedRoute: Redirecting to auth - not authenticated');
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
   
+  // Не требуется авторизация, но пользователь авторизован
   if (!requireAuth && isAuthenticated) {
-    return <Navigate to="/profile" replace />;
+    console.log('ProtectedRoute: Redirecting to profile - already authenticated');
+    const from = location.state?.from || '/';
+    return <Navigate to={from} replace />;
   }
   
+  console.log('ProtectedRoute: Rendering children');
   return <>{children}</>;
 };
 

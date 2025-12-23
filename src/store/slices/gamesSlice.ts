@@ -85,7 +85,6 @@ const initialState: GamesState = {
 
 // Вспомогательная функция для преобразования игры с отношениями в простую игру
 const transformGame = (gameWithRelations: any): Game => {
-  console.log('Transforming game:', gameWithRelations?.title);
   
   // Обрабатываем image_url
   let imageUrl = gameWithRelations.image_url;
@@ -111,9 +110,6 @@ const transformGame = (gameWithRelations: any): Game => {
     gg.genres?.name
   ).filter(Boolean) || [];
 
-  console.log(`  Platforms: ${platforms.join(', ')}`);
-  console.log(`  Genres: ${genres.join(', ')}`);
-
   return {
     id: gameWithRelations.id,
     title: gameWithRelations.title,
@@ -137,8 +133,6 @@ export const fetchGames = createAsyncThunk(
       const { page, limit, filters } = state.games;
       const from = (page - 1) * limit;
       const to = from + limit - 1;
-
-      console.log('Fetching games with filters:', filters);
 
       let query = supabase
         .from('games')
@@ -202,8 +196,6 @@ export const fetchGames = createAsyncThunk(
         console.error('Supabase error:', error);
         throw error;
       }
-
-      console.log('Filtered games raw:', games);
       
       // Преобразуем данные
       const transformedGames = games?.map(transformGame) || [];
@@ -245,7 +237,6 @@ export const fetchGameById = createAsyncThunk(
 
       if (error) throw error;
       
-      console.log('Game by ID raw:', game);
       return transformGame(game);
 
     } catch (error: any) {
@@ -261,8 +252,6 @@ export const fetchFeaturedGames = createAsyncThunk(
     try {
       const state = getState() as { games: GamesState };
       const { filters } = state.games;
-      
-      console.log('Fetching featured games with filters:', filters);
       
       let query = supabase
         .from('games')
@@ -302,9 +291,7 @@ export const fetchFeaturedGames = createAsyncThunk(
         throw error;
       }
       
-      console.log('Raw featured games from Supabase:', games);
       const transformedGames = games?.map(transformGame) || [];
-      console.log('Transformed featured games:', transformedGames);
       return transformedGames;
 
     } catch (error: any) {
@@ -321,8 +308,6 @@ export const fetchNewReleases = createAsyncThunk(
     try {
       const state = getState() as { games: GamesState };
       const { filters } = state.games;
-      
-      console.log('Fetching new releases with filters:', filters);
       
       let query = supabase
         .from('games')
@@ -362,9 +347,7 @@ export const fetchNewReleases = createAsyncThunk(
         throw error;
       }
       
-      console.log('Raw new releases from Supabase:', games);
       const transformedGames = games?.map(transformGame) || [];
-      console.log('Transformed new releases:', transformedGames);
       return transformedGames;
 
     } catch (error: any) {
@@ -397,7 +380,6 @@ export const fetchAllGames = createAsyncThunk(
         .order('title', { ascending: true });
 
       if (error) throw error;
-      console.log('All games raw:', games);
       const transformedGames = games?.map(transformGame) || [];
       return transformedGames;
 

@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import AuthService from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../store/hooks';
+import { loginUser } from '../../store/slices/authSlice';
 import './AuthForms.css';
 
-const LoginForm = ({ onSuccess, switchToRegister }) => {
+const LoginForm = ({ switchToRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -23,18 +27,15 @@ const LoginForm = ({ onSuccess, switchToRegister }) => {
     setLoading(true);
 
     try {
-      const result = await AuthService.login(
-        formData.email,
-        formData.password
-      );
-
-      if (result.success) {
-        onSuccess?.(result.user);
-      } else {
-        setError(result.error);
-      }
-    } catch (err) {
-      setError('Произошла ошибка при входе');
+      const result = await dispatch(loginUser({
+        email: formData.email,
+        password: formData.password
+      })).unwrap();
+      
+      // Успешный вход - перенаправляем на главную
+      navigate('/');
+    } catch (err: any) {
+      setError(err || 'Произошла ошибка при входе');
     } finally {
       setLoading(false);
     }

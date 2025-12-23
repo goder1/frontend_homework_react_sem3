@@ -1,6 +1,6 @@
 // src/store/slices/profileSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { RootState } from '..';
+import { RootState } from '../index';
 import { UserGame, ProfileStats, ProfileState, AddGameData, UpdateGameData } from '../../types/profile';
 import { supabase } from '../../lib/supabaseClient';
 import { Game } from './gamesSlice';
@@ -430,7 +430,23 @@ export const selectProfileLoading = (state: RootState) => state.profile.isLoadin
 export const selectProfileError = (state: RootState) => state.profile.error;
 
 // Импортируем селектор всех игр из gamesSlice
-export const selectAllGames = (state: RootState) => state.games.games;
+export const selectAllGames = (state: RootState) => {
+  // Проверяем, существует ли свойство games в state
+  console.log('Full state structure:', state);
+  console.log('state.games:', state.games);
+  if (!state.games) {
+    console.warn('State.games is undefined');
+    return [];
+  }
+  
+  // Проверяем, существует ли свойство games в state.games
+  if (!state.games.games) {
+    console.warn('State.games.games is undefined');
+    return [];
+  }
+  
+  return state.games.games;
+};
 
 // Селектор для игры пользователя по ID игры
 export const selectUserGameByGameId = (gameId: string) => 

@@ -6,7 +6,7 @@ import {
   logoutUser, 
   selectCurrentUser 
 } from '../store/slices/authSlice';
-import { selectAllGames, fetchAllGames } from '../store/slices/gamesSlice'; // Добавили fetchAllGames
+import { fetchAllGames } from '../store/slices/gamesSlice'; // Добавили fetchAllGames
 import {
   // Селекторы
   selectUserGames,
@@ -28,6 +28,7 @@ import {
 import { UserGame } from '../types/profile';
 import { Game } from '../types/game';
 import styles from './ProfilePage.module.css';
+import { RootState } from '../store/store';
 
 // Моковый профиль для заглушки (будет заменен данными из authSlice)
 const mockProfile = {
@@ -48,7 +49,7 @@ const ProfilePage: React.FC = () => {
   
   // Получаем данные из Redux
   const user = useAppSelector(selectCurrentUser);
-  const allGames = useAppSelector(selectAllGames);
+  const allGames = useAppSelector((state: RootState) => state.games?.games || []);
   const userGames = useAppSelector(selectUserGames);
   const profileStats = useAppSelector(selectProfileStats);
   const isLoading = useAppSelector(selectProfileLoading);
@@ -170,7 +171,7 @@ const ProfilePage: React.FC = () => {
   const handleLogout = async () => {
     try {
       await dispatch(logoutUser()).unwrap();
-      dispatch(resetProfile());
+      //dispatch(resetProfile());
       navigate('/');
     } catch (error) {
       console.error('Ошибка при выходе:', error);
