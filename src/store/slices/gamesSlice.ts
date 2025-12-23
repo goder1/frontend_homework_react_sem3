@@ -83,19 +83,77 @@ const initialState: GamesState = {
   allGenres: ['Action', 'RPG', 'Strategy', 'Adventure', 'Shooter', 'Simulation', 'Sports', 'Horror', 'Indie', 'Fantasy', 'Sci-Fi']
 };
 
+// Добавьте функцию для проверки изображений
+export const debugImages = async () => {
+  console.log('=== DEBUG IMAGES ===');
+  
+  const { data: games } = await supabase
+    .from('games')
+    .select('id, title, image_url')
+    .limit(3);
+  
+  games?.forEach(game => {
+    console.log(`Game: ${game.title}`);
+    console.log(`  Image URL in DB: "${game.image_url}"`);
+    console.log(`  URL type: ${typeof game.image_url}`);
+    console.log(`  Is empty: ${!game.image_url}`);
+  });
+  
+  // Проверим конкретную картинку
+  const cyberpunkId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+  const { data: cyberpunk } = await supabase
+    .from('games')
+    .select('image_url')
+    .eq('id', cyberpunkId)
+    .single();
+  
+  console.log('\nCyberpunk image URL:', cyberpunk?.image_url);
+  
+  // Попробуем создать полный URL
+  const bucketUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public`;
+  console.log('Bucket base URL:', bucketUrl);
+  
+  if (cyberpunk?.image_url) {
+    const fullUrl = `${bucketUrl}/${cyberpunk.image_url}`;
+    console.log('Full image URL:', fullUrl);
+    
+    // Проверим доступность
+    try {
+      const response = await fetch(fullUrl, { method: 'HEAD' });
+      console.log('Image accessible:', response.ok);
+    } catch (e) {
+      console.log('Image check error:', e);
+    }
+  }
+};
+
 // Вспомогательная функция для преобразования игры с отношениями в простую игру
 const transformGame = (gameWithRelations: any): Game => {
   console.log('Transforming game:', gameWithRelations?.title);
   
-  // Извлекаем платформы из новой структуры
+  // Извлекаем платформы
   const platforms = gameWithRelations.game_platforms?.map((gp: any) => 
     gp.platforms?.name
   ).filter(Boolean) || [];
 
-  // Извлекаем жанры из новой структуры
+  // Извлекаем жанры
   const genres = gameWithRelations.game_genres?.map((gg: any) => 
     gg.genres?.name
   ).filter(Boolean) || [];
+
+  // ОБРАБАТЫВАЕМ IMAGE_URL
+  let imageUrl = gameWithRelations.image_url;
+  
+  // Если путь начинается с 'public/images/', преобразуем в полный URL
+  if (imageUrl && imageUrl.startsWith('public/images/')) {
+    // Убираем 'public/' из начала
+    const cleanPath = imageUrl.replace('public/', '');
+    imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${cleanPath}`;
+    console.log(`  Converted image URL: ${imageUrl}`);
+  } else if (imageUrl && !imageUrl.startsWith('http')) {
+    // Если это относительный путь без 'public/'
+    imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${imageUrl}`;
+  }
 
   console.log(`  Platforms: ${platforms.join(', ')}`);
   console.log(`  Genres: ${genres.join(', ')}`);
@@ -104,7 +162,7 @@ const transformGame = (gameWithRelations: any): Game => {
     id: gameWithRelations.id,
     title: gameWithRelations.title,
     description: gameWithRelations.description,
-    image_url: gameWithRelations.image_url,
+    image_url: imageUrl, // Теперь это полный URL
     rating: gameWithRelations.rating,
     price: gameWithRelations.price,
     release_date: gameWithRelations.release_date,

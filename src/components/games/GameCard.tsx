@@ -41,7 +41,7 @@ const GameCard: React.FC<GameCardProps> = ({
   return (
     <div className={styles.gameCard}>
       <div className={styles.gameImage}>
-        <img src={game.imageUrl} alt={game.title} />
+        <img src={game.image_url} alt={game.title} />
         <button
           className={`${styles.favoriteBtn} ${isFavorite ? styles.active : ''}`}
           onClick={handleToggleFavorite}

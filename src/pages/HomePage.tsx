@@ -11,7 +11,8 @@ import {
   fetchFeaturedGames,
   fetchNewReleases,
   testDirectQuery,
-  debugDatabaseContent
+  debugDatabaseContent,
+  debugImages
 } from '../store/slices/gamesSlice';
 import GameFilters from '../components/games/GameFilters';
 import GameCard from '../components/games/GameCard';
@@ -29,6 +30,8 @@ const HomePage: React.FC = () => {
   const popularGames = useAppSelector(selectFeaturedGames);
   const newReleases = useAppSelector(selectNewReleases);
   const isLoading = useAppSelector(selectGamesLoading);
+  
+  debugImages();
   
   //testDirectQuery();
   //debugDatabaseContent();
