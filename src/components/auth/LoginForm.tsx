@@ -41,7 +41,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
       // Успешный вход - перенаправляем на главную
       await navigate('/');
     } catch (err: unknown) {
-      setError(err || 'Произошла ошибка при входе');
+      if (typeof err === 'string') {
+        setError(err);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Произошла ошибка при входе');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,8 @@
 import React from 'react';
 import GameFilters from './GameFilters';
 import GameCard from './GameCard';
-import { Game, FilterState } from '../../types/game';
+import { Game } from '../../types/game';
+import { FilterState } from '../../store/slices/gamesSlice';
 import styles from './GamesList.module.css';
 
 interface GamesListProps {

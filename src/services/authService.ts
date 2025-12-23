@@ -29,7 +29,7 @@ class AuthService {
     } catch (error: unknown) {
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }

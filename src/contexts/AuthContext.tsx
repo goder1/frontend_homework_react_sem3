@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const checkAuth = () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const savedUser: User = localStorage.getItem('user');
+        const savedUser: string | null = localStorage.getItem('user');
 
         if (token && savedUser) {
           const user: User = JSON.parse(savedUser);
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           user: null,
           isAuthenticated: false,
           isLoading: false,
-          error: error,
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     };
