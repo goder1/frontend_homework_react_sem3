@@ -27,6 +27,7 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
       : [...filters.platforms, platform];
     
     dispatch(updateFilters({ platforms: newPlatforms }));
+    console.log('Platforms changed:', newPlatforms);
     onFilterChange?.({ ...filters, platforms: newPlatforms });
   };
 
@@ -36,21 +37,26 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
       : [...filters.genres, genre];
     
     dispatch(updateFilters({ genres: newGenres }));
+    console.log('Genres changed:', newGenres);
     onFilterChange?.({ ...filters, genres: newGenres });
   };
 
   const handleSortChange = (sortBy: any) => {
     dispatch(updateFilters({ sortBy }));
+    console.log('Sort changed:', sortBy);
     onFilterChange?.({ ...filters, sortBy });
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(updateFilters({ searchQuery: e.target.value }));
-    onFilterChange?.({ ...filters, searchQuery: e.target.value });
+    const value = e.target.value;
+    dispatch(updateFilters({ searchQuery: value }));
+    console.log('Search changed:', value);
+    onFilterChange?.({ ...filters, searchQuery: value });
   };
 
   const handleReset = () => {
     dispatch(resetFilters());
+    console.log('Filters reset');
     onFilterChange?.({
       platforms: [],
       genres: [],
@@ -149,6 +155,9 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
               )}
               {filters.genres.length > 0 && (
                 <span>Жанры: {filters.genres.join(', ')}</span>
+              )}
+              {filters.searchQuery && (
+                <span>Поиск: "{filters.searchQuery}"</span>
               )}
             </div>
           </div>

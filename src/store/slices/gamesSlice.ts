@@ -12,8 +12,8 @@ export interface Game {
   price: number;
   release_date: string;
   achievements?: number;
-  platforms?: string[]; // Упростим для profileSlice
-  genres?: string[];    // Упростим для profileSlice
+  platforms?: string[];
+  genres?: string[];
 }
 
 export interface GameWithRelations {
@@ -25,13 +25,13 @@ export interface GameWithRelations {
   price: number;
   release_date: string;
   achievements?: number;
-  game_platforms?: Array<{  // Изменено с platforms на game_platforms
+  game_platforms?: Array<{
     platforms: {
       id: string;
       name: string;
     }
   }>;
-  game_genres?: Array<{  // Изменено с genres на game_genres
+  game_genres?: Array<{
     genres: {
       id: string;
       name: string;
@@ -83,54 +83,24 @@ const initialState: GamesState = {
   allGenres: ['Action', 'RPG', 'Strategy', 'Adventure', 'Shooter', 'Simulation', 'Sports', 'Horror', 'Indie', 'Fantasy', 'Sci-Fi']
 };
 
-// Добавьте функцию для проверки изображений
-export const debugImages = async () => {
-  console.log('=== DEBUG IMAGES ===');
-  
-  const { data: games } = await supabase
-    .from('games')
-    .select('id, title, image_url')
-    .limit(3);
-  
-  games?.forEach(game => {
-    console.log(`Game: ${game.title}`);
-    console.log(`  Image URL in DB: "${game.image_url}"`);
-    console.log(`  URL type: ${typeof game.image_url}`);
-    console.log(`  Is empty: ${!game.image_url}`);
-  });
-  
-  // Проверим конкретную картинку
-  const cyberpunkId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-  const { data: cyberpunk } = await supabase
-    .from('games')
-    .select('image_url')
-    .eq('id', cyberpunkId)
-    .single();
-  
-  console.log('\nCyberpunk image URL:', cyberpunk?.image_url);
-  
-  // Попробуем создать полный URL
-  const bucketUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public`;
-  console.log('Bucket base URL:', bucketUrl);
-  
-  if (cyberpunk?.image_url) {
-    const fullUrl = `${bucketUrl}/${cyberpunk.image_url}`;
-    console.log('Full image URL:', fullUrl);
-    
-    // Проверим доступность
-    try {
-      const response = await fetch(fullUrl, { method: 'HEAD' });
-      console.log('Image accessible:', response.ok);
-    } catch (e) {
-      console.log('Image check error:', e);
-    }
-  }
-};
-
 // Вспомогательная функция для преобразования игры с отношениями в простую игру
 const transformGame = (gameWithRelations: any): Game => {
   console.log('Transforming game:', gameWithRelations?.title);
   
+  // Обрабатываем image_url
+  let imageUrl = gameWithRelations.image_url;
+  
+  if (imageUrl && !imageUrl.startsWith('http')) {
+    // Если путь начинается с 'public/images/', преобразуем в полный URL
+    if (imageUrl.startsWith('public/images/')) {
+      const cleanPath = imageUrl.replace('public/', '');
+      imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${cleanPath}`;
+    } else if (imageUrl.startsWith('images/')) {
+      // Или просто 'images/'
+      imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${imageUrl}`;
+    }
+  }
+
   // Извлекаем платформы
   const platforms = gameWithRelations.game_platforms?.map((gp: any) => 
     gp.platforms?.name
@@ -141,20 +111,6 @@ const transformGame = (gameWithRelations: any): Game => {
     gg.genres?.name
   ).filter(Boolean) || [];
 
-  // ОБРАБАТЫВАЕМ IMAGE_URL
-  let imageUrl = gameWithRelations.image_url;
-  
-  // Если путь начинается с 'public/images/', преобразуем в полный URL
-  if (imageUrl && imageUrl.startsWith('public/images/')) {
-    // Убираем 'public/' из начала
-    const cleanPath = imageUrl.replace('public/', '');
-    imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${cleanPath}`;
-    console.log(`  Converted image URL: ${imageUrl}`);
-  } else if (imageUrl && !imageUrl.startsWith('http')) {
-    // Если это относительный путь без 'public/'
-    imageUrl = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${imageUrl}`;
-  }
-
   console.log(`  Platforms: ${platforms.join(', ')}`);
   console.log(`  Genres: ${genres.join(', ')}`);
 
@@ -162,7 +118,7 @@ const transformGame = (gameWithRelations: any): Game => {
     id: gameWithRelations.id,
     title: gameWithRelations.title,
     description: gameWithRelations.description,
-    image_url: imageUrl, // Теперь это полный URL
+    image_url: imageUrl,
     rating: gameWithRelations.rating,
     price: gameWithRelations.price,
     release_date: gameWithRelations.release_date,
@@ -181,6 +137,8 @@ export const fetchGames = createAsyncThunk(
       const { page, limit, filters } = state.games;
       const from = (page - 1) * limit;
       const to = from + limit - 1;
+
+      console.log('Fetching games with filters:', filters);
 
       let query = supabase
         .from('games')
@@ -201,6 +159,17 @@ export const fetchGames = createAsyncThunk(
       // Поиск
       if (filters.searchQuery) {
         query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+      }
+
+      // Фильтрация по платформам
+      if (filters.platforms.length > 0) {
+        // Для фильтрации по платформам через связующую таблицу
+        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+      }
+
+      // Фильтрация по жанрам
+      if (filters.genres.length > 0) {
+        query = query.filter('game_genres.genres.name', 'in', `(${filters.genres.join(',')})`);
       }
 
       // Сортировка
@@ -229,9 +198,13 @@ export const fetchGames = createAsyncThunk(
       // Пагинация
       const { data: games, error, count } = await query.range(from, to);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       console.log('Filtered games raw:', games);
+      
       // Преобразуем данные
       const transformedGames = games?.map(transformGame) || [];
 
@@ -241,6 +214,7 @@ export const fetchGames = createAsyncThunk(
       };
 
     } catch (error: any) {
+      console.error('Error in fetchGames:', error);
       return rejectWithValue(error.message);
     }
   }
@@ -280,105 +254,17 @@ export const fetchGameById = createAsyncThunk(
   }
 );
 
-export const testDirectQuery = async () => {
-  const testGameId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; // Cyberpunk 2077
-  
-  // Проверяем напрямую через game_platforms
-  const { data, error } = await supabase
-    .from('game_platforms')
-    .select('*')
-  
-  console.log('Direct query result:', data);
-  console.log('Direct query error:', error);
-  
-  return data;
-};
-
-export const debugDatabaseContent = async () => {
-  console.log('=== DATABASE DIAGNOSTICS ===');
-  
-  try {
-    // 1. Проверим таблицу games
-    const { data: allGames, count: gamesCount } = await supabase
-      .from('games')
-      .select('id, title', { count: 'exact' })
-      .limit(5);
-    
-    console.log(`Games table has ${gamesCount} entries`);
-    console.log('First 5 games:', allGames);
-    
-    // 2. Проверим таблицу platforms
-    const { data: allPlatforms } = await supabase
-      .from('platforms')
-      .select('*');
-    
-    console.log(`Platforms:`, allPlatforms);
-    
-    // 3. Проверим таблицу game_platforms ВСЕ записи
-    const { data: allGamePlatforms, count: gpCount } = await supabase
-      .from('game_platforms')
-      .select('game_id, platform_id', { count: 'exact' });
-    
-    console.log(`game_platforms has ${gpCount} entries`);
-    console.log('All game_platforms entries:', allGamePlatforms);
-    
-    // 4. Проверим конкретную игру с разными форматами ID
-    const cyberpunkId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-    
-    // Вариант 1: Проверка в таблице games
-    const { data: cyberpunkGame } = await supabase
-      .from('games')
-      .select('*')
-      .eq('id', cyberpunkId)
-      .single();
-    
-    console.log('\nCyberpunk game from games table:', cyberpunkGame);
-    
-    // Вариант 2: Проверка в game_platforms с разными форматами
-    console.log('\nChecking game_platforms with different ID formats:');
-    
-    // С дефисами
-    const { data: gp1 } = await supabase
-      .from('game_platforms')
-      .select('*')
-      .eq('game_id', cyberpunkId);
-    console.log('With hyphens:', gp1);
-    
-    // Без дефисов
-    const idNoHyphens = cyberpunkId.replace(/-/g, '');
-    const { data: gp2 } = await supabase
-      .from('game_platforms')
-      .select('*')
-      .eq('game_id', idNoHyphens);
-    console.log('Without hyphens:', gp2);
-    
-    // В верхнем регистре
-    const { data: gp3 } = await supabase
-      .from('game_platforms')
-      .select('*')
-      .eq('game_id', cyberpunkId.toUpperCase());
-    console.log('Uppercase:', gp3);
-    
-    // 5. Проверим RLS политики
-    console.log('\n=== RLS CHECK ===');
-    const { data: rlsInfo } = await supabase
-      .rpc('get_rls_policies'); // Нужно создать эту функцию
-    
-    console.log('RLS info:', rlsInfo);
-    
-  } catch (error) {
-    console.error('Diagnostic error:', error);
-  }
-};
-
 // Получение популярных игр (фичеред)
 export const fetchFeaturedGames = createAsyncThunk(
   'games/fetchFeaturedGames',
-  async (limit: number = 6, { rejectWithValue }) => {
+  async (limit: number = 6, { getState, rejectWithValue }) => {
     try {
-      console.log('Fetching featured games...');
+      const state = getState() as { games: GamesState };
+      const { filters } = state.games;
       
-      const { data: games, error } = await supabase
+      console.log('Fetching featured games with filters:', filters);
+      
+      let query = supabase
         .from('games')
         .select(`
           *,
@@ -395,6 +281,21 @@ export const fetchFeaturedGames = createAsyncThunk(
         `)
         .order('rating', { ascending: false })
         .limit(limit);
+
+      // Применяем фильтры
+      if (filters.platforms.length > 0) {
+        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+      }
+      
+      if (filters.genres.length > 0) {
+        query = query.filter('game_genres.genres.name', 'in', `(${filters.genres.join(',')})`);
+      }
+      
+      if (filters.searchQuery) {
+        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+      }
+
+      const { data: games, error } = await query;
 
       if (error) {
         console.error('Error fetching featured games:', error);
@@ -416,10 +317,14 @@ export const fetchFeaturedGames = createAsyncThunk(
 // Получение новых релизов
 export const fetchNewReleases = createAsyncThunk(
   'games/fetchNewReleases',
-  async (limit: number = 6, { rejectWithValue }) => {
+  async (limit: number = 6, { getState, rejectWithValue }) => {
     try {
-      console.log('Fetching new releases...');
-      const { data: games, error } = await supabase
+      const state = getState() as { games: GamesState };
+      const { filters } = state.games;
+      
+      console.log('Fetching new releases with filters:', filters);
+      
+      let query = supabase
         .from('games')
         .select(`
           *,
@@ -437,10 +342,26 @@ export const fetchNewReleases = createAsyncThunk(
         .order('release_date', { ascending: false })
         .limit(limit);
 
+      // Применяем фильтры
+      if (filters.platforms.length > 0) {
+        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+      }
+      
+      if (filters.genres.length > 0) {
+        query = query.filter('game_genres.genres.name', 'in', `(${filters.genres.join(',')})`);
+      }
+      
+      if (filters.searchQuery) {
+        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+      }
+
+      const { data: games, error } = await query;
+
       if (error) {
         console.error('Error fetching new releases:', error);
         throw error;
       }
+      
       console.log('Raw new releases from Supabase:', games);
       const transformedGames = games?.map(transformGame) || [];
       console.log('Transformed new releases:', transformedGames);
@@ -504,9 +425,13 @@ const gamesSlice = createSlice({
     clearCurrentGame: (state) => {
       state.currentGame = null;
     },
-    // Добавляем action для обновления списка всех игр
     setAllGames: (state, action: PayloadAction<Game[]>) => {
       state.games = action.payload;
+    },
+    // Новый action для принудительной перезагрузки
+    triggerGamesRefresh: (state) => {
+      // Просто меняем page, чтобы triggerнуть эффект
+      state.page = state.page;
     }
   },
   extraReducers: (builder) => {
@@ -587,7 +512,8 @@ export const {
   updateFilters,
   resetFilters,
   clearCurrentGame,
-  setAllGames
+  setAllGames,
+  triggerGamesRefresh
 } = gamesSlice.actions;
 
 // Селекторы
