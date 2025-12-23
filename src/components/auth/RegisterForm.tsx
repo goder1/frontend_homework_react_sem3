@@ -1,41 +1,55 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import AuthService from '../../services/authService';
-import { useAppDispatch } from '../../store/hooks';
 import './AuthForms.css';
 
+// Определяем интерфейс для пользователя
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  // добавьте другие поля пользователя по мере необходимости
+}
+
+// Определяем интерфейс для результата регистрации
+interface AuthResult {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
 interface RegisterFormProps {
-  onSuccess?: (user: any) => void;
+  onSuccess?: (user: User) => void;
   switchToLogin: () => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, switchToLogin }) => {
-  useAppDispatch();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    
+
     // Валидация
     if (formData.password !== formData.confirmPassword) {
       setError('Пароли не совпадают');
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError('Пароль должен быть не менее 6 символов');
       return;
@@ -43,29 +57,46 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, switchToLogin })
 
     setLoading(true);
 
-    try {
-      const result = await AuthService.register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
-      });
+    // Оборачиваем асинхронный вызов в функцию, которая не возвращает Promise
+    const registerUser = async () => {
+      try {
+        const result = (await AuthService.register({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        })) as AuthResult;
 
-      if (result.success) {
-        onSuccess?.(result.user);
-      } else {
-        setError(result.error);
+        if (result.success && result.user) {
+          if (onSuccess) {
+            onSuccess(result.user);
+          }
+        } else {
+          const errorMessage = result.error || 'Ошибка регистрации';
+          setError(errorMessage);
+        }
+      } catch (err: unknown) {
+        // Используем err переменную
+        console.error('Registration error:', err);
+        if (err instanceof Error) {
+          setError(err.message);
+        } else if (typeof err === 'string') {
+          setError(err);
+        } else {
+          setError('Произошла ошибка при регистрации');
+        }
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Произошла ошибка при регистрации');
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    // Вызываем асинхронную функцию
+    void registerUser();
   };
 
   return (
     <div className="auth-form">
       <h2>Регистрация</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit}>
@@ -123,21 +154,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, switchToLogin })
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="submit-btn"
-          disabled={loading}
-        >
+        <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? 'Регистрация...' : 'Зарегистрироваться'}
         </button>
 
         <div className="form-footer">
           <span>Уже есть аккаунт?</span>
-          <button 
-            type="button" 
-            className="switch-btn"
-            onClick={switchToLogin}
-          >
+          <button type="button" className="switch-btn" onClick={switchToLogin}>
             Войти
           </button>
         </div>

@@ -15,24 +15,19 @@ export interface GameFilters {
 class GameService {
   // Получение игр с фильтрами
   static async getGames(filters: GameFilters = {}) {
-    const {
-      page = 1,
-      limit = 12,
-      search = '',
-      sortBy = 'rating',
-      sortOrder = 'desc'
-    } = filters;
+    const { page = 1, limit = 12, search = '', sortBy = 'rating', sortOrder = 'desc' } = filters;
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
-    let query = supabase
-      .from('games')
-      .select(`
+    let query = supabase.from('games').select(
+      `
         *,
         platforms:game_platforms(platforms(*)),
         genres:game_genres(genres(*))
-      `, { count: 'exact' });
+      `,
+      { count: 'exact' }
+    );
 
     // Фильтрация
     if (search) {
@@ -52,7 +47,7 @@ class GameService {
       total: count || 0,
       page,
       limit,
-      totalPages: count ? Math.ceil(count / limit) : 1
+      totalPages: count ? Math.ceil(count / limit) : 1,
     };
   }
 
@@ -60,11 +55,13 @@ class GameService {
   static async getGameById(id: string) {
     const { data: game, error } = await supabase
       .from('games')
-      .select(`
+      .select(
+        `
         *,
         platforms:game_platforms(platforms(*)),
         genres:game_genres(genres(*))
-      `)
+      `
+      )
       .eq('id', id)
       .single();
 
@@ -76,11 +73,13 @@ class GameService {
   static async getPopularGames(limit: number = 6) {
     const { data: games, error } = await supabase
       .from('games')
-      .select(`
+      .select(
+        `
         *,
         platforms:game_platforms(platforms(*)),
         genres:game_genres(genres(*))
-      `)
+      `
+      )
       .order('rating', { ascending: false })
       .limit(limit);
 
@@ -92,11 +91,13 @@ class GameService {
   static async getNewReleases(limit: number = 6) {
     const { data: games, error } = await supabase
       .from('games')
-      .select(`
+      .select(
+        `
         *,
         platforms:game_platforms(platforms(*)),
         genres:game_genres(genres(*))
-      `)
+      `
+      )
       .order('release_date', { ascending: false })
       .limit(limit);
 
@@ -106,7 +107,9 @@ class GameService {
 
   // Добавление/удаление из избранного
   static async toggleFavorite(gameId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) throw new Error('Не авторизован');
 
     // Проверяем, есть ли уже в избранном
@@ -124,18 +127,16 @@ class GameService {
         .delete()
         .eq('user_id', user.id)
         .eq('game_id', gameId);
-      
+
       if (error) throw error;
       return { isFavorite: false };
     } else {
       // Добавляем
-      const { error } = await supabase
-        .from('user_favorites')
-        .insert({
-          user_id: user.id,
-          game_id: gameId
-        });
-      
+      const { error } = await supabase.from('user_favorites').insert({
+        user_id: user.id,
+        game_id: gameId,
+      });
+
       if (error) throw error;
       return { isFavorite: true };
     }
@@ -143,7 +144,9 @@ class GameService {
 
   // Проверка, в избранном ли игра
   static async isFavorite(gameId: string) {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return false;
 
     const { data } = await supabase
@@ -158,15 +161,19 @@ class GameService {
 
   // Получение избранных игр пользователя
   static async getFavorites() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return [];
 
     const { data: favorites, error } = await supabase
       .from('user_favorites')
-      .select(`
+      .select(
+        `
         created_at,
         games(*)
-      `)
+      `
+      )
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 

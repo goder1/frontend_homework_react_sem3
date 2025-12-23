@@ -29,13 +29,13 @@ export interface GameWithRelations {
     platforms: {
       id: string;
       name: string;
-    }
+    };
   }>;
   game_genres?: Array<{
     genres: {
       id: string;
       name: string;
-    }
+    };
   }>;
 }
 
@@ -77,18 +77,29 @@ const initialState: GamesState = {
     searchQuery: '',
     platforms: [],
     genres: [],
-    sortBy: 'popular'
+    sortBy: 'popular',
   },
   allPlatforms: ['PC', 'PlayStation', 'Xbox', 'Nintendo Switch'],
-  allGenres: ['Action', 'RPG', 'Strategy', 'Adventure', 'Shooter', 'Simulation', 'Sports', 'Horror', 'Indie', 'Fantasy', 'Sci-Fi']
+  allGenres: [
+    'Action',
+    'RPG',
+    'Strategy',
+    'Adventure',
+    'Shooter',
+    'Simulation',
+    'Sports',
+    'Horror',
+    'Indie',
+    'Fantasy',
+    'Sci-Fi',
+  ],
 };
 
 // Вспомогательная функция для преобразования игры с отношениями в простую игру
 const transformGame = (gameWithRelations: any): Game => {
-  
   // Обрабатываем image_url
   let imageUrl = gameWithRelations.image_url;
-  
+
   if (imageUrl && !imageUrl.startsWith('http')) {
     // Если путь начинается с 'public/images/', преобразуем в полный URL
     if (imageUrl.startsWith('public/images/')) {
@@ -101,14 +112,12 @@ const transformGame = (gameWithRelations: any): Game => {
   }
 
   // Извлекаем платформы
-  const platforms = gameWithRelations.game_platforms?.map((gp: any) => 
-    gp.platforms?.name
-  ).filter(Boolean) || [];
+  const platforms =
+    gameWithRelations.game_platforms?.map((gp: any) => gp.platforms?.name).filter(Boolean) || [];
 
   // Извлекаем жанры
-  const genres = gameWithRelations.game_genres?.map((gg: any) => 
-    gg.genres?.name
-  ).filter(Boolean) || [];
+  const genres =
+    gameWithRelations.game_genres?.map((gg: any) => gg.genres?.name).filter(Boolean) || [];
 
   return {
     id: gameWithRelations.id,
@@ -120,7 +129,7 @@ const transformGame = (gameWithRelations: any): Game => {
     release_date: gameWithRelations.release_date,
     achievements: gameWithRelations.achievements,
     platforms: platforms,
-    genres: genres
+    genres: genres,
   };
 };
 
@@ -134,9 +143,8 @@ export const fetchGames = createAsyncThunk(
       const from = (page - 1) * limit;
       const to = from + limit - 1;
 
-      let query = supabase
-        .from('games')
-        .select(`
+      let query = supabase.from('games').select(
+        `
           *,
           game_platforms (
             platforms (
@@ -148,17 +156,25 @@ export const fetchGames = createAsyncThunk(
               name
             )
           )
-        `, { count: 'exact' });
+        `,
+        { count: 'exact' }
+      );
 
       // Поиск
       if (filters.searchQuery) {
-        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+        query = query.or(
+          `title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`
+        );
       }
 
       // Фильтрация по платформам
       if (filters.platforms.length > 0) {
         // Для фильтрации по платформам через связующую таблицу
-        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+        query = query.filter(
+          'game_platforms.platforms.name',
+          'in',
+          `(${filters.platforms.join(',')})`
+        );
       }
 
       // Фильтрация по жанрам
@@ -169,7 +185,7 @@ export const fetchGames = createAsyncThunk(
       // Сортировка
       let sortBy: 'rating' | 'release_date' | 'title' = 'rating';
       let sortOrder: 'asc' | 'desc' = 'desc';
-      
+
       switch (filters.sortBy) {
         case 'popular':
         case 'rating':
@@ -196,15 +212,14 @@ export const fetchGames = createAsyncThunk(
         console.error('Supabase error:', error);
         throw error;
       }
-      
+
       // Преобразуем данные
       const transformedGames = games?.map(transformGame) || [];
 
       return {
         games: transformedGames,
-        total: count || 0
+        total: count || 0,
       };
-
     } catch (error: any) {
       console.error('Error in fetchGames:', error);
       return rejectWithValue(error.message);
@@ -219,7 +234,8 @@ export const fetchGameById = createAsyncThunk(
     try {
       const { data: game, error } = await supabase
         .from('games')
-        .select(`
+        .select(
+          `
           *,
           game_platforms (
             platforms (
@@ -231,14 +247,14 @@ export const fetchGameById = createAsyncThunk(
               name
             )
           )
-        `)
+        `
+        )
         .eq('id', id)
         .single();
 
       if (error) throw error;
-      
-      return transformGame(game);
 
+      return transformGame(game);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -252,10 +268,11 @@ export const fetchFeaturedGames = createAsyncThunk(
     try {
       const state = getState() as { games: GamesState };
       const { filters } = state.games;
-      
+
       let query = supabase
         .from('games')
-        .select(`
+        .select(
+          `
           *,
           game_platforms (
             platforms (
@@ -267,21 +284,28 @@ export const fetchFeaturedGames = createAsyncThunk(
               name
             )
           )
-        `)
+        `
+        )
         .order('rating', { ascending: false })
         .limit(limit);
 
       // Применяем фильтры
       if (filters.platforms.length > 0) {
-        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+        query = query.filter(
+          'game_platforms.platforms.name',
+          'in',
+          `(${filters.platforms.join(',')})`
+        );
       }
-      
+
       if (filters.genres.length > 0) {
         query = query.filter('game_genres.genres.name', 'in', `(${filters.genres.join(',')})`);
       }
-      
+
       if (filters.searchQuery) {
-        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+        query = query.or(
+          `title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`
+        );
       }
 
       const { data: games, error } = await query;
@@ -290,10 +314,9 @@ export const fetchFeaturedGames = createAsyncThunk(
         console.error('Error fetching featured games:', error);
         throw error;
       }
-      
+
       const transformedGames = games?.map(transformGame) || [];
       return transformedGames;
-
     } catch (error: any) {
       console.error('Error in fetchFeaturedGames:', error);
       return rejectWithValue(error.message);
@@ -308,10 +331,11 @@ export const fetchNewReleases = createAsyncThunk(
     try {
       const state = getState() as { games: GamesState };
       const { filters } = state.games;
-      
+
       let query = supabase
         .from('games')
-        .select(`
+        .select(
+          `
           *,
           game_platforms (
             platforms (
@@ -323,21 +347,28 @@ export const fetchNewReleases = createAsyncThunk(
               name
             )
           )
-        `)
+        `
+        )
         .order('release_date', { ascending: false })
         .limit(limit);
 
       // Применяем фильтры
       if (filters.platforms.length > 0) {
-        query = query.filter('game_platforms.platforms.name', 'in', `(${filters.platforms.join(',')})`);
+        query = query.filter(
+          'game_platforms.platforms.name',
+          'in',
+          `(${filters.platforms.join(',')})`
+        );
       }
-      
+
       if (filters.genres.length > 0) {
         query = query.filter('game_genres.genres.name', 'in', `(${filters.genres.join(',')})`);
       }
-      
+
       if (filters.searchQuery) {
-        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+        query = query.or(
+          `title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`
+        );
       }
 
       const { data: games, error } = await query;
@@ -346,10 +377,9 @@ export const fetchNewReleases = createAsyncThunk(
         console.error('Error fetching new releases:', error);
         throw error;
       }
-      
+
       const transformedGames = games?.map(transformGame) || [];
       return transformedGames;
-
     } catch (error: any) {
       console.error('Error in fetchNewReleases:', error);
       return rejectWithValue(error.message);
@@ -364,7 +394,8 @@ export const fetchAllGames = createAsyncThunk(
     try {
       const { data: games, error } = await supabase
         .from('games')
-        .select(`
+        .select(
+          `
           *,
           game_platforms (
             platforms (
@@ -376,13 +407,13 @@ export const fetchAllGames = createAsyncThunk(
               name
             )
           )
-        `)
+        `
+        )
         .order('title', { ascending: true });
 
       if (error) throw error;
       const transformedGames = games?.map(transformGame) || [];
       return transformedGames;
-
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -400,26 +431,26 @@ const gamesSlice = createSlice({
       state.filters = { ...state.filters, ...action.payload };
       state.page = 1; // Сбрасываем страницу при изменении фильтров
     },
-    resetFilters: (state) => {
+    resetFilters: state => {
       state.filters = initialState.filters;
       state.page = 1;
     },
-    clearCurrentGame: (state) => {
+    clearCurrentGame: state => {
       state.currentGame = null;
     },
     setAllGames: (state, action: PayloadAction<Game[]>) => {
       state.games = action.payload;
     },
     // Новый action для принудительной перезагрузки
-    triggerGamesRefresh: (state) => {
+    triggerGamesRefresh: state => {
       // Просто меняем page, чтобы triggerнуть эффект
       state.page = state.page;
-    }
+    },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // fetchGames
-      .addCase(fetchGames.pending, (state) => {
+      .addCase(fetchGames.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -432,9 +463,9 @@ const gamesSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      
+
       // fetchGameById
-      .addCase(fetchGameById.pending, (state) => {
+      .addCase(fetchGameById.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -446,33 +477,33 @@ const gamesSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-      
+
       // fetchFeaturedGames
-      .addCase(fetchFeaturedGames.pending, (state) => {
+      .addCase(fetchFeaturedGames.pending, state => {
         state.loading = true;
       })
       .addCase(fetchFeaturedGames.fulfilled, (state, action) => {
         state.loading = false;
         state.featuredGames = action.payload;
       })
-      .addCase(fetchFeaturedGames.rejected, (state) => {
+      .addCase(fetchFeaturedGames.rejected, state => {
         state.loading = false;
       })
-      
+
       // fetchNewReleases
-      .addCase(fetchNewReleases.pending, (state) => {
+      .addCase(fetchNewReleases.pending, state => {
         state.loading = true;
       })
       .addCase(fetchNewReleases.fulfilled, (state, action) => {
         state.loading = false;
         state.newReleases = action.payload;
       })
-      .addCase(fetchNewReleases.rejected, (state) => {
+      .addCase(fetchNewReleases.rejected, state => {
         state.loading = false;
       })
-      
+
       // fetchAllGames
-      .addCase(fetchAllGames.pending, (state) => {
+      .addCase(fetchAllGames.pending, state => {
         state.loading = true;
         state.error = null;
       })
@@ -485,7 +516,7 @@ const gamesSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       });
-  }
+  },
 });
 
 // Экспортируем actions
@@ -495,7 +526,7 @@ export const {
   resetFilters,
   clearCurrentGame,
   setAllGames,
-  triggerGamesRefresh
+  triggerGamesRefresh,
 } = gamesSlice.actions;
 
 // Селекторы

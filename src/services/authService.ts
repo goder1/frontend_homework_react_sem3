@@ -4,20 +4,16 @@ import { supabase } from '../lib/supabaseClient';
 
 class AuthService {
   // Регистрация
-  static async register(userData: {
-    email: string;
-    password: string;
-    username: string;
-  }) {
+  static async register(userData: { email: string; password: string; username: string }) {
     try {
       const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
         options: {
           data: {
-            username: userData.username
-          }
-        }
+            username: userData.username,
+          },
+        },
       });
 
       if (error) throw error;
@@ -27,14 +23,13 @@ class AuthService {
         user: {
           id: data.user?.id,
           email: data.user?.email,
-          username: userData.username
-        }
+          username: userData.username,
+        },
       };
-
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -44,7 +39,7 @@ class AuthService {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
 
       if (error) throw error;
@@ -62,14 +57,13 @@ class AuthService {
           id: data.user.id,
           email: data.user.email,
           username: profile?.username || email.split('@')[0],
-          avatar_url: profile?.avatar_url
-        }
+          avatar_url: profile?.avatar_url,
+        },
       };
-
     } catch (error: any) {
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -95,7 +89,7 @@ class AuthService {
       id: data.session.user.id,
       email: data.session.user.email,
       username: profile?.username || data.session.user.email?.split('@')[0],
-      avatar_url: profile?.avatar_url
+      avatar_url: profile?.avatar_url,
     };
   }
 

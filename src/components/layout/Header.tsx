@@ -9,39 +9,35 @@ const Header: React.FC = () => {
       <div className="container">
         <div className={styles.headerContent}>
           <Link to="/" className={styles.logo}>
-            <h1>Game<span>Catalog</span></h1>
+            <h1>
+              Game<span>Catalog</span>
+            </h1>
             <p className={styles.tagline}>Ваш гид в мире видеоигр</p>
           </Link>
 
           <nav className={styles.nav}>
             <ul className={styles.navList}>
               <li>
-                <NavLink 
-                  to="/" 
-                  className={({ isActive }) => 
-                    `${styles.navLink} ${isActive ? styles.active : ''}`
-                  }
+                <NavLink
+                  to="/"
+                  className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
                   end
                 >
                   Каталог
                 </NavLink>
               </li>
               <li>
-                <NavLink 
-                  to="/favorites" 
-                  className={({ isActive }) => 
-                    `${styles.navLink} ${isActive ? styles.active : ''}`
-                  }
+                <NavLink
+                  to="/favorites"
+                  className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
                 >
                   Избранное
                 </NavLink>
               </li>
               <li>
-                <NavLink 
-                  to="/profile" 
-                  className={({ isActive }) => 
-                    `${styles.navLink} ${isActive ? styles.active : ''}`
-                  }
+                <NavLink
+                  to="/profile"
+                  className={({ isActive }) => `${styles.navLink} ${isActive ? styles.active : ''}`}
                 >
                   Профиль
                 </NavLink>

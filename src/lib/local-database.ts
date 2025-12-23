@@ -112,30 +112,30 @@
 //  userData: RegisterData
 //): Promise<{ user: Omit<User, 'password_hash'>; token?: string }> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    // Проверяем существование пользователя с таким email или username
 //    const existingUser = await client.query(
 //      `SELECT id FROM users WHERE email = $1 OR username = $2`,
 //      [userData.email, userData.username]
 //    );
-//    
+//
 //    if (existingUser.rows.length > 0) {
 //      throw new Error('Пользователь с таким email или именем уже существует');
 //    }
-//    
+//
 //    // Хешируем пароль
 //    const passwordHash = await hashPassword(userData.password);
-//    
+//
 //    // Создаем пользователя
 //    const result = await client.query<User>(
 //      `
 //      INSERT INTO users (
-//        username, email, password_hash, display_name, 
+//        username, email, password_hash, display_name,
 //        join_date, last_login, is_active
 //      )
 //      VALUES ($1, $2, $3, $4, NOW(), NOW(), true)
-//      RETURNING 
+//      RETURNING
 //        id, username, email, display_name, avatar_url, bio,
 //        level, total_games, total_hours, favorite_genre,
 //        join_date, last_login, is_active, created_at, updated_at
@@ -147,13 +147,13 @@
 //        userData.display_name || userData.username
 //      ]
 //    );
-//    
+//
 //    const user = result.rows[0];
-//    
+//
 //    // Для упрощения, здесь можно генерировать JWT токен
 //    // В реальном приложении используйте jsonwebtoken
 //    const token = `local-token-${user.id}-${Date.now()}`;
-//    
+//
 //    return {
 //      user: {
 //        ...user,
@@ -161,7 +161,7 @@
 //      } as Omit<User, 'password_hash'>,
 //      token
 //    };
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -172,39 +172,39 @@
 //  credentials: LoginCredentials
 //): Promise<{ user: Omit<User, 'password_hash'>; token?: string }> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    // Ищем пользователя по email
 //    const result = await client.query<User>(
 //      `
-//      SELECT * FROM users 
+//      SELECT * FROM users
 //      WHERE email = $1 AND is_active = true
 //      `,
 //      [credentials.email]
 //    );
-//    
+//
 //    if (result.rows.length === 0) {
 //      throw new Error('Пользователь не найден');
 //    }
-//    
+//
 //    const user = result.rows[0];
-//    
+//
 //    // Проверяем пароль
 //    const isValidPassword = await verifyPassword(credentials.password, user.password_hash);
-//    
+//
 //    if (!isValidPassword) {
 //      throw new Error('Неверный пароль');
 //    }
-//    
+//
 //    // Обновляем last_login
 //    await client.query(
 //      `UPDATE users SET last_login = NOW() WHERE id = $1`,
 //      [user.id]
 //    );
-//    
+//
 //    // Генерируем токен
 //    const token = `local-token-${user.id}-${Date.now()}`;
-//    
+//
 //    return {
 //      user: {
 //        ...user,
@@ -212,7 +212,7 @@
 //      } as Omit<User, 'password_hash'>,
 //      token
 //    };
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -221,22 +221,22 @@
 //// Получение пользователя по ID
 //export async function getUserById(userId: number): Promise<Omit<User, 'password_hash'> | null> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<User>(
 //      `
-//      SELECT 
+//      SELECT
 //        id, username, email, display_name, avatar_url, bio,
 //        level, total_games, total_hours, favorite_genre,
 //        join_date, last_login, is_active, created_at, updated_at
-//      FROM users 
+//      FROM users
 //      WHERE id = $1 AND is_active = true
 //      `,
 //      [userId]
 //    );
-//    
+//
 //    return result.rows[0] || null;
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -253,62 +253,62 @@
 //  }
 //): Promise<Omit<User, 'password_hash'>> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    // Формируем динамический запрос на основе переданных полей
 //    const fields = [];
 //    const values = [];
 //    let paramIndex = 1;
-//    
+//
 //    if (updates.display_name !== undefined) {
 //      fields.push(`display_name = $${paramIndex}`);
 //      values.push(updates.display_name);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.avatar_url !== undefined) {
 //      fields.push(`avatar_url = $${paramIndex}`);
 //      values.push(updates.avatar_url);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.bio !== undefined) {
 //      fields.push(`bio = $${paramIndex}`);
 //      values.push(updates.bio);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.favorite_genre !== undefined) {
 //      fields.push(`favorite_genre = $${paramIndex}`);
 //      values.push(updates.favorite_genre);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (fields.length === 0) {
 //      throw new Error('Нет полей для обновления');
 //    }
-//    
+//
 //    values.push(userId);
-//    
+//
 //    const result = await client.query<User>(
 //      `
-//      UPDATE users 
+//      UPDATE users
 //      SET ${fields.join(', ')}
 //      WHERE id = $${paramIndex} AND is_active = true
-//      RETURNING 
+//      RETURNING
 //        id, username, email, display_name, avatar_url, bio,
 //        level, total_games, total_hours, favorite_genre,
 //        join_date, last_login, is_active, created_at, updated_at
 //      `,
 //      values
 //    );
-//    
+//
 //    if (result.rows.length === 0) {
 //      throw new Error('Пользователь не найден');
 //    }
-//    
+//
 //    return result.rows[0];
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -327,7 +327,7 @@
 //  sortOrder?: 'asc' | 'desc';
 //}): Promise<{ games: Game[]; total: number }> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const {
 //      page = 1,
@@ -338,54 +338,54 @@
 //      sortBy = 'rating',
 //      sortOrder = 'desc'
 //    } = options || {};
-//    
+//
 //    const offset = (page - 1) * limit;
-//    
+//
 //    // Формируем WHERE условия
 //    const whereConditions = [];
 //    const queryParams = [];
 //    let paramIndex = 1;
-//    
+//
 //    if (search) {
 //      whereConditions.push(`(g.title ILIKE $${paramIndex} OR g.description ILIKE $${paramIndex})`);
 //      queryParams.push(`%${search}%`);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (platforms.length > 0) {
 //      const platformConditions = platforms.map((_, idx) => `p.name = $${paramIndex + idx}`);
 //      whereConditions.push(`(${platformConditions.join(' OR ')})`);
 //      queryParams.push(...platforms);
 //      paramIndex += platforms.length;
 //    }
-//    
+//
 //    if (genres.length > 0) {
 //      const genreConditions = genres.map((_, idx) => `gr.name = $${paramIndex + idx}`);
 //      whereConditions.push(`(${genreConditions.join(' OR ')})`);
 //      queryParams.push(...genres);
 //      paramIndex += genres.length;
 //    }
-//    
+//
 //    // Формируем JOIN условия для платформ и жанров
 //    const joins = [];
 //    if (platforms.length > 0) {
 //      joins.push(`JOIN game_platforms gp ON g.id = gp.game_id`);
 //      joins.push(`JOIN platforms p ON gp.platform_id = p.id`);
 //    }
-//    
+//
 //    if (genres.length > 0) {
 //      joins.push(`JOIN game_genres gg ON g.id = gg.game_id`);
 //      joins.push(`JOIN genres gr ON gg.genre_id = gr.id`);
 //    }
-//    
-//    const whereClause = whereConditions.length > 0 
-//      ? `WHERE ${whereConditions.join(' AND ')}` 
+//
+//    const whereClause = whereConditions.length > 0
+//      ? `WHERE ${whereConditions.join(' AND ')}`
 //      : '';
-//    
+//
 //    // Получаем игры
 //    const gamesQuery = await client.query<Game>(
 //      `
-//      SELECT 
+//      SELECT
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
 //        array_agg(DISTINCT gr.name) as genres
@@ -401,7 +401,7 @@
 //      `,
 //      [...queryParams, limit, offset]
 //    );
-//    
+//
 //    // Получаем общее количество
 //    const countQuery = await client.query(
 //      `
@@ -412,12 +412,12 @@
 //      `,
 //      queryParams
 //    );
-//    
+//
 //    return {
 //      games: gamesQuery.rows,
 //      total: parseInt(countQuery.rows[0].total)
 //    };
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -426,11 +426,11 @@
 //// Получение игры по ID
 //export async function getGameById(id: number): Promise<Game | null> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<Game>(
 //      `
-//      SELECT 
+//      SELECT
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
 //        array_agg(DISTINCT gr.name) as genres
@@ -444,9 +444,9 @@
 //      `,
 //      [id]
 //    );
-//    
+//
 //    return result.rows[0] || null;
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -455,11 +455,11 @@
 //// Получение популярных игр
 //export async function getPopularGames(limit: number = 6): Promise<Game[]> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<Game>(
 //      `
-//      SELECT 
+//      SELECT
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
 //        array_agg(DISTINCT gr.name) as genres
@@ -474,9 +474,9 @@
 //      `,
 //      [limit]
 //    );
-//    
+//
 //    return result.rows;
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -485,11 +485,11 @@
 //// Получение новых релизов
 //export async function getNewReleases(limit: number = 6): Promise<Game[]> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<Game>(
 //      `
-//      SELECT 
+//      SELECT
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
 //        array_agg(DISTINCT gr.name) as genres
@@ -504,9 +504,9 @@
 //      `,
 //      [limit]
 //    );
-//    
+//
 //    return result.rows;
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -517,7 +517,7 @@
 //// Добавление игры в избранное
 //export async function addToFavorites(userId: number, gameId: number): Promise<void> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    await client.query(
 //      `
@@ -535,11 +535,11 @@
 //// Удаление игры из избранного
 //export async function removeFromFavorites(userId: number, gameId: number): Promise<void> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    await client.query(
 //      `
-//      DELETE FROM user_favorites 
+//      DELETE FROM user_favorites
 //      WHERE user_id = $1 AND game_id = $2
 //      `,
 //      [userId, gameId]
@@ -552,11 +552,11 @@
 //// Получение избранных игр пользователя
 //export async function getUserFavorites(userId: number): Promise<Game[]> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<Game>(
 //      `
-//      SELECT 
+//      SELECT
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
 //        array_agg(DISTINCT gr.name) as genres
@@ -572,7 +572,7 @@
 //      `,
 //      [userId]
 //    );
-//    
+//
 //    return result.rows;
 //  } finally {
 //    client.release();
@@ -582,16 +582,16 @@
 //// Проверка, находится ли игра в избранном
 //export async function isGameInFavorites(userId: number, gameId: number): Promise<boolean> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query(
 //      `
-//      SELECT 1 FROM user_favorites 
+//      SELECT 1 FROM user_favorites
 //      WHERE user_id = $1 AND game_id = $2
 //      `,
 //      [userId, gameId]
 //    );
-//    
+//
 //    return result.rows.length > 0;
 //  } finally {
 //    client.release();
@@ -613,12 +613,12 @@
 //  }
 //): Promise<UserGame> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const result = await client.query<UserGame>(
 //      `
 //      INSERT INTO user_games (
-//        user_id, game_id, user_rating, hours_played, 
+//        user_id, game_id, user_rating, hours_played,
 //        achievements_completed, status, notes, last_played
 //      )
 //      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
@@ -641,7 +641,7 @@
 //        gameData.notes || null
 //      ]
 //    );
-//    
+//
 //    return result.rows[0];
 //  } finally {
 //    client.release();
@@ -660,65 +660,65 @@
 //  }
 //): Promise<UserGame> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const fields = [];
 //    const values = [];
 //    let paramIndex = 1;
-//    
+//
 //    if (updates.userRating !== undefined) {
 //      fields.push(`user_rating = $${paramIndex}`);
 //      values.push(updates.userRating);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.hoursPlayed !== undefined) {
 //      fields.push(`hours_played = $${paramIndex}`);
 //      values.push(updates.hoursPlayed);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.achievementsCompleted !== undefined) {
 //      fields.push(`achievements_completed = $${paramIndex}`);
 //      values.push(updates.achievementsCompleted);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.status !== undefined) {
 //      fields.push(`status = $${paramIndex}`);
 //      values.push(updates.status);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (updates.notes !== undefined) {
 //      fields.push(`notes = $${paramIndex}`);
 //      values.push(updates.notes);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (fields.length === 0) {
 //      throw new Error('Нет полей для обновления');
 //    }
-//    
+//
 //    // Добавляем last_played и updated_at
 //    fields.push(`last_played = NOW()`);
-//    
+//
 //    values.push(userGameId);
-//    
+//
 //    const result = await client.query<UserGame>(
 //      `
-//      UPDATE user_games 
+//      UPDATE user_games
 //      SET ${fields.join(', ')}
 //      WHERE id = $${paramIndex}
 //      RETURNING *
 //      `,
 //      values
 //    );
-//    
+//
 //    if (result.rows.length === 0) {
 //      throw new Error('Игра не найдена в коллекции');
 //    }
-//    
+//
 //    return result.rows[0];
 //  } finally {
 //    client.release();
@@ -728,7 +728,7 @@
 //// Удаление игры из коллекции
 //export async function removeGameFromCollection(userGameId: number): Promise<void> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    await client.query(
 //      `DELETE FROM user_games WHERE id = $1`,
@@ -750,7 +750,7 @@
 //  }
 //): Promise<{ games: UserGame[]; total: number }> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    const {
 //      page = 1,
@@ -758,33 +758,33 @@
 //      status,
 //      search = ''
 //    } = options || {};
-//    
+//
 //    const offset = (page - 1) * limit;
-//    
+//
 //    const whereConditions = ['ug.user_id = $1'];
 //    const queryParams = [userId];
 //    let paramIndex = 2;
-//    
+//
 //    if (status) {
 //      whereConditions.push(`ug.status = $${paramIndex}`);
 //      queryParams.push(status);
 //      paramIndex++;
 //    }
-//    
+//
 //    if (search) {
 //      whereConditions.push(`g.title ILIKE $${paramIndex}`);
 //      queryParams.push(`%${search}%`);
 //      paramIndex++;
 //    }
-//    
-//    const whereClause = whereConditions.length > 0 
-//      ? `WHERE ${whereConditions.join(' AND ')}` 
+//
+//    const whereClause = whereConditions.length > 0
+//      ? `WHERE ${whereConditions.join(' AND ')}`
 //      : '';
-//    
+//
 //    // Получаем игры с пагинацией
 //    const gamesQuery = await client.query<{ ug: UserGame; g: Game; platforms: string[]; genres: string[] }>(
 //      `
-//      SELECT 
+//      SELECT
 //        ug.*,
 //        g.*,
 //        array_agg(DISTINCT p.name) as platforms,
@@ -802,7 +802,7 @@
 //      `,
 //      [...queryParams, limit, offset]
 //    );
-//    
+//
 //    // Преобразуем результат
 //    const games = gamesQuery.rows.map(row => ({
 //      ...row.ug,
@@ -812,7 +812,7 @@
 //        genres: row.genres
 //      }
 //    }));
-//    
+//
 //    // Получаем общее количество
 //    const countQuery = await client.query(
 //      `
@@ -823,12 +823,12 @@
 //      `,
 //      queryParams
 //    );
-//    
+//
 //    return {
 //      games,
 //      total: parseInt(countQuery.rows[0].total)
 //    };
-//    
+//
 //  } finally {
 //    client.release();
 //  }
@@ -844,12 +844,12 @@
 //  completionRate: number;
 //}> {
 //  const client = await pool.connect();
-//  
+//
 //  try {
 //    // Общая статистика
 //    const statsQuery = await client.query(
 //      `
-//      SELECT 
+//      SELECT
 //        COUNT(*) as total_games,
 //        COALESCE(SUM(hours_played), 0) as total_hours,
 //        COALESCE(AVG(user_rating), 0) as average_rating,
@@ -859,7 +859,7 @@
 //      `,
 //      [userId]
 //    );
-//    
+//
 //    // Статистика по статусам
 //    const statusQuery = await client.query(
 //      `
@@ -870,7 +870,7 @@
 //      `,
 //      [userId]
 //    );
-//    
+//
 //    // Любимый жанр
 //    const genreQuery = await client.query(
 //      `
@@ -886,18 +886,18 @@
 //      `,
 //      [userId]
 //    );
-//    
+//
 //    const stats = statsQuery.rows[0];
 //    const gamesByStatus: Record<string, number> = {};
-//    
+//
 //    statusQuery.rows.forEach(row => {
 //      gamesByStatus[row.status] = parseInt(row.count);
 //    });
-//    
+//
 //    const totalGames = parseInt(stats.total_games) || 0;
 //    const completedGames = parseInt(stats.completed_games) || 0;
 //    const completionRate = totalGames > 0 ? (completedGames / totalGames) * 100 : 0;
-//    
+//
 //    return {
 //      totalGames,
 //      totalHours: parseInt(stats.total_hours) || 0,
@@ -906,7 +906,7 @@
 //      favoriteGenre: genreQuery.rows[0]?.name,
 //      completionRate
 //    };
-//    
+//
 //  } finally {
 //    client.release();
 //  }

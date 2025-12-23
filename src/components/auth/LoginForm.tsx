@@ -11,7 +11,7 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -31,27 +31,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
     setLoading(true);
 
     try {
-      dispatch(loginUser({
-        email: formData.email,
-        password: formData.password
-      })).unwrap();
-      
+      await dispatch(
+        loginUser({
+          email: formData.email,
+          password: formData.password,
+        })
+      ).unwrap();
+
       // Успешный вход - перенаправляем на главную
-      navigate('/');
-    } catch (err: any) {
+      await navigate('/');
+    } catch (err: unknown) {
       setError(err || 'Произошла ошибка при входе');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void handleSubmit(e); // Явно игнорируем промис с void
+  };
+
   return (
     <div className="auth-form">
       <h2>Вход в аккаунт</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleFormSubmit}>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -78,21 +85,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="submit-btn"
-          disabled={loading}
-        >
+        <button type="submit" className="submit-btn" disabled={loading}>
           {loading ? 'Вход...' : 'Войти'}
         </button>
 
         <div className="form-footer">
           <span>Нет аккаунта?</span>
-          <button 
-            type="button" 
-            className="switch-btn"
-            onClick={switchToRegister}
-          >
+          <button type="button" className="switch-btn" onClick={switchToRegister}>
             Зарегистрироваться
           </button>
         </div>

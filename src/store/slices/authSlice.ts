@@ -72,7 +72,10 @@ export const loginUser = createAsyncThunk(
 // Регистрация пользователя
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async ({ email, password, username }: { email: string; password: string; username?: string }, { rejectWithValue }) => {
+  async (
+    { email, password, username }: { email: string; password: string; username?: string },
+    { rejectWithValue }
+  ) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -107,66 +110,63 @@ export const registerUser = createAsyncThunk(
 );
 
 // Выход пользователя
-export const logoutUser = createAsyncThunk(
-  'auth/logout',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      return null;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка выхода');
-    }
+export const logoutUser = createAsyncThunk('auth/logout', async (_, { rejectWithValue }) => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    return null;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Ошибка выхода');
   }
-);
+});
 
 // Проверка текущей сессии (alias для checkUserSession)
-export const checkAuth = createAsyncThunk(
-  'auth/checkAuth',
-  async (_, { rejectWithValue }) => {
-    try {
-      const { data, error } = await supabase.auth.getSession();
-      
-      if (error) throw error;
-      
-      if (data.session?.user) {
-        // Получаем профиль пользователя
-        const { data: profile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', data.session.user.id)
-          .single();
+export const checkAuth = createAsyncThunk('auth/checkAuth', async (_, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
 
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile:', profileError);
-        }
+    if (error) throw error;
 
-        const user: User = {
-          id: data.session.user.id,
-          email: data.session.user.email || '',
-          username: profile?.username || data.session.user.email?.split('@')[0] || 'User',
-          avatar_url: profile?.avatar_url || '/images/default-avatar.png',
-          created_at: data.session.user.created_at,
-        };
+    if (data.session?.user) {
+      // Получаем профиль пользователя
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', data.session.user.id)
+        .single();
 
-        return user;
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
       }
 
-      return null;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка проверки сессии');
+      const user: User = {
+        id: data.session.user.id,
+        email: data.session.user.email || '',
+        username: profile?.username || data.session.user.email?.split('@')[0] || 'User',
+        avatar_url: profile?.avatar_url || '/images/default-avatar.png',
+        created_at: data.session.user.created_at,
+      };
+
+      return user;
     }
+
+    return null;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Ошибка проверки сессии');
   }
-);
+});
 
 // Обновление профиля
 export const updateUserProfile = createAsyncThunk(
   'auth/updateProfile',
-  async ({ username, avatar_url }: { username?: string; avatar_url?: string }, { getState, rejectWithValue }) => {
+  async (
+    { username, avatar_url }: { username?: string; avatar_url?: string },
+    { getState, rejectWithValue }
+  ) => {
     try {
       const state = getState() as { auth: AuthState };
       const userId = state.auth.user?.id;
-      
+
       if (!userId) {
         throw new Error('User not authenticated');
       }
@@ -206,17 +206,17 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = !!action.payload;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
     setInitialized: (state, action: PayloadAction<boolean>) => {
       state.isInitialized = action.payload;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // checkAuth
-      .addCase(checkAuth.pending, (state) => {
+      .addCase(checkAuth.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -232,9 +232,9 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.isInitialized = true;
       })
-      
+
       // loginUser
-      .addCase(loginUser.pending, (state) => {
+      .addCase(loginUser.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -248,9 +248,9 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.isAuthenticated = false;
       })
-      
+
       // registerUser
-      .addCase(registerUser.pending, (state) => {
+      .addCase(registerUser.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -264,12 +264,12 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.isAuthenticated = false;
       })
-      
+
       // logoutUser
-      .addCase(logoutUser.pending, (state) => {
+      .addCase(logoutUser.pending, state => {
         state.isLoading = true;
       })
-      .addCase(logoutUser.fulfilled, (state) => {
+      .addCase(logoutUser.fulfilled, state => {
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
@@ -288,9 +288,9 @@ const authSlice = createSlice({
         state.error = action.payload as string;
         state.isInitialized = true;
       })
-      
+
       // updateUserProfile
-      .addCase(updateUserProfile.pending, (state) => {
+      .addCase(updateUserProfile.pending, state => {
         state.isLoading = true;
         state.error = null;
       })

@@ -21,7 +21,7 @@ const loadAuthState = () => {
 
 // Предзагруженное состояние
 const preloadedState = {
-  auth: loadAuthState()
+  auth: loadAuthState(),
 };
 
 export const store = configureStore({
@@ -32,20 +32,20 @@ export const store = configureStore({
     favorites: favoritesReducer,
   },
   preloadedState,
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [
-          'auth/login/fulfilled', 
-          'auth/register/fulfilled', 
+          'auth/login/fulfilled',
+          'auth/register/fulfilled',
           'auth/checkAuth/fulfilled',
-          'auth/checkAuth/rejected'
+          'auth/checkAuth/rejected',
         ],
         ignoredPaths: ['auth.user'],
       },
     }).concat((store: any) => (next: any) => (action: any) => {
       const result = next(action);
-      
+
       // Сохраняем только auth состояние
       if (action.type.startsWith('auth/')) {
         const authState = store.getState().auth;
@@ -62,7 +62,7 @@ export const store = configureStore({
           console.error('Error saving auth state:', err);
         }
       }
-      
+
       return result;
     }),
   devTools: process.env.NODE_ENV !== 'production',

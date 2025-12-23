@@ -19,41 +19,53 @@ const App: React.FC = () => {
       <Router>
         <Routes>
           {/* Страница авторизации - доступна только для неавторизованных */}
-          <Route path="/auth" element={
-            <ProtectedRoute requireAuth={false} redirectTo="/">
-              <AuthPage />
-            </ProtectedRoute>
-          } />
-          
+          <Route
+            path="/auth"
+            element={
+              <ProtectedRoute requireAuth={false} redirectTo="/">
+                <AuthPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Основной layout для всех страниц */}
           <Route element={<Layout />}>
             {/* Главная страница */}
             <Route path="/" element={<HomePage />} />
-            
+
             {/* Страница деталей игры */}
             <Route path="/game/:id" element={<GameDetailsPage />} />
-            
+
             {/* Избранное - только для авторизованных */}
-            <Route path="/favorites" element={
-              <ProtectedRoute requireAuth={true} redirectTo="/auth">
-                <FavoritesPage />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/favorites"
+              element={
+                <ProtectedRoute requireAuth={true} redirectTo="/auth">
+                  <FavoritesPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Профиль - только для авторизованных */}
-            <Route path="/profile" element={
-              <ProtectedRoute requireAuth={true} redirectTo="/auth">
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute requireAuth={true} redirectTo="/auth">
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* 404 - страница не найдена */}
-            <Route path="*" element={
-              <div className="not-found-page">
-                <h2>404 - Страница не найдена</h2>
-                <p>Извините, запрашиваемая страница не существует.</p>
-              </div>
-            } />
+            <Route
+              path="*"
+              element={
+                <div className="not-found-page">
+                  <h2>404 - Страница не найдена</h2>
+                  <p>Извините, запрашиваемая страница не существует.</p>
+                </div>
+              }
+            />
           </Route>
         </Routes>
       </Router>

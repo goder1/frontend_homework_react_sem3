@@ -12,9 +12,8 @@ export const useGames = () => {
   //const filteredGames = useSelector((state: RootState) => state.games.filteredGames);
   const filters = useSelector((state: RootState) => state.games.filters);
   const isLoading = useSelector((state: RootState) => state.games.loading);
-  
+
   return { games, filters, isLoading };
 };
 
-export const useSelectedGame = () => 
-  useSelector((state: RootState) => state.games.currentGame);
+export const useSelectedGame = () => useSelector((state: RootState) => state.games.currentGame);

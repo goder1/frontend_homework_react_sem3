@@ -2,12 +2,12 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { 
-  selectAllFavorites, 
-  selectFavoritesCount, 
+import {
+  selectAllFavorites,
+  selectFavoritesCount,
   selectFavoritesLoading,
   selectAverageRating,
-  loadFavorites
+  loadFavorites,
 } from '../store/slices/favoritesSlice';
 import GameFilters from '../components/games/GameFilters';
 import GameCard from '../components/games/GameCard';
@@ -15,7 +15,7 @@ import styles from './FavoritesPage.module.css';
 
 const FavoritesPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  
+
   // Получаем данные из Redux
   const favorites = useAppSelector(selectAllFavorites);
   const favoritesCount = useAppSelector(selectFavoritesCount);
@@ -58,7 +58,7 @@ const FavoritesPage: React.FC = () => {
             <h1>Избранное</h1>
             <p>Ваши любимые игры появятся здесь</p>
           </div>
-          
+
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>🎮</div>
             <h3>Пока здесь пусто</h3>
@@ -75,7 +75,7 @@ const FavoritesPage: React.FC = () => {
   return (
     <div className={styles.favoritesPage}>
       <GameFilters onFilterChange={handleFilterChange} />
-      
+
       <div className="container">
         <div className={styles.pageHeader}>
           <h1>Избранное</h1>
@@ -94,11 +94,9 @@ const FavoritesPage: React.FC = () => {
         </div>
 
         <div className={styles.gamesGrid}>
-          {favorites.map((game) => (
+          {favorites.map(game => (
             <div key={game.id} className={styles.gameCardWrapper}>
-              <GameCard
-                game={game}
-              />
+              <GameCard game={game} />
             </div>
           ))}
         </div>

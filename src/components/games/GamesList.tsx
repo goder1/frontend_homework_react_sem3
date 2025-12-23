@@ -23,20 +23,16 @@ const GamesList: React.FC<GamesListProps> = ({
 }) => {
   return (
     <div className={styles.gamesList}>
-      {showFilters && (
-        <GameFilters onFilterChange={onFilterChange} />
-      )}
-      
+      {showFilters && <GameFilters onFilterChange={onFilterChange} />}
+
       <div className="container">
         {showTitle && (
           <div className={styles.pageHeader}>
             <h1>{title}</h1>
-            {games.length > 0 && (
-              <p className={styles.gamesCount}>Найдено игр: {games.length}</p>
-            )}
+            {games.length > 0 && <p className={styles.gamesCount}>Найдено игр: {games.length}</p>}
           </div>
         )}
-        
+
         {games.length === 0 ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>🎮</div>
@@ -45,11 +41,8 @@ const GamesList: React.FC<GamesListProps> = ({
           </div>
         ) : (
           <div className={styles.gamesGrid}>
-            {games.map((game) => (
-              <GameCard
-                key={game.id}
-                game={game}
-              />
+            {games.map(game => (
+              <GameCard key={game.id} game={game} />
             ))}
           </div>
         )}

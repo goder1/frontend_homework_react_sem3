@@ -54,13 +54,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Проверка авторизации при загрузке
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const savedUser = localStorage.getItem('user');
-        
+        const savedUser: User = localStorage.getItem('user');
+
         if (token && savedUser) {
-          const user = JSON.parse(savedUser);
+          const user: User = JSON.parse(savedUser);
           setAuthState({
             user,
             isAuthenticated: true,
@@ -70,12 +70,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
           setAuthState(prev => ({ ...prev, isLoading: false }));
         }
-      } catch (error) {
+      } catch (error: unknown) {
         setAuthState({
           user: null,
           isAuthenticated: false,
           isLoading: false,
-          error: 'Ошибка проверки авторизации',
+          error: error,
         });
       }
     };
@@ -85,24 +85,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+
     try {
       // Имитация запроса к API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Проверка учетных данных
       const user = mockUsers.find(u => u.email === credentials.email);
-      
+
       if (!user) {
         throw new Error('Пользователь с таким email не найден');
       }
-      
+
       // В реальном приложении здесь была бы проверка пароля
       const mockPassword = 'password123';
       if (credentials.password !== mockPassword) {
         throw new Error('Неверный пароль');
       }
-      
+
       // Сохраняем в localStorage если запомнить
       if (credentials.rememberMe) {
         localStorage.setItem('auth_token', 'mock_jwt_token');
@@ -111,14 +111,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         sessionStorage.setItem('auth_token', 'mock_jwt_token');
         sessionStorage.setItem('user', JSON.stringify(user));
       }
-      
+
       setAuthState({
         user,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
-      
     } catch (error) {
       setAuthState({
         user: null,
@@ -132,27 +131,27 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const register = async (data: RegisterData): Promise<void> => {
     setAuthState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+
     try {
       // Имитация запроса к API
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Проверка паролей
       if (data.password !== data.confirmPassword) {
         throw new Error('Пароли не совпадают');
       }
-      
+
       // Проверка согласия с условиями
       if (!data.agreeToTerms) {
         throw new Error('Необходимо согласиться с условиями использования');
       }
-      
+
       // Проверка уникальности email
       const emailExists = mockUsers.some(u => u.email === data.email);
       if (emailExists) {
         throw new Error('Пользователь с таким email уже существует');
       }
-      
+
       // Создание нового пользователя
       const newUser: User = {
         id: (mockUsers.length + 1).toString(),
@@ -168,18 +167,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         joinDate: new Date().toISOString().split('T')[0],
         isOnline: true,
       };
-      
+
       // Сохраняем в localStorage
       localStorage.setItem('auth_token', 'mock_jwt_token');
       localStorage.setItem('user', JSON.stringify(newUser));
-      
+
       setAuthState({
         user: newUser,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
-      
     } catch (error) {
       setAuthState({
         user: null,
@@ -197,7 +195,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('user');
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('user');
-    
+
     setAuthState({
       user: null,
       isAuthenticated: false,
@@ -210,7 +208,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (authState.user) {
       const updatedUser = { ...authState.user, ...userData };
       setAuthState(prev => ({ ...prev, user: updatedUser }));
-      
+
       // Обновляем в localStorage
       const storage = localStorage.getItem('auth_token') ? localStorage : sessionStorage;
       storage.setItem('user', JSON.stringify(updatedUser));

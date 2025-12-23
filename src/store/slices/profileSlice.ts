@@ -1,7 +1,13 @@
 // src/store/slices/profileSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../index';
-import { UserGame, ProfileStats, ProfileState, AddGameData, UpdateGameData } from '../../types/profile';
+import {
+  UserGame,
+  ProfileStats,
+  ProfileState,
+  AddGameData,
+  UpdateGameData,
+} from '../../types/profile';
 import { supabase } from '../../lib/supabaseClient';
 import { Game } from './gamesSlice';
 
@@ -42,7 +48,8 @@ function calculateStats(userGames: UserGame[], allGames: Game[] = []): ProfileSt
     totalGames: userGames.length,
     totalHours: userGames.reduce((sum, game) => sum + game.hoursPlayed, 0),
     averageRating: userGames.reduce((sum, game) => sum + game.userRating, 0) / userGames.length,
-    completionRate: userGames.reduce((sum, game) => sum + game.completionPercentage, 0) / userGames.length,
+    completionRate:
+      userGames.reduce((sum, game) => sum + game.completionPercentage, 0) / userGames.length,
     favoriteGenre: 'Не указан',
     favoritePlatform: 'Не указана',
     achievementsTotal: userGames.reduce((sum, game) => sum + game.totalAchievements, 0),
@@ -132,7 +139,9 @@ export const fetchUserGames = createAsyncThunk(
         totalAchievements: 0, // В вашей таблице нет этого поля, нужно добавить или рассчитать
         completionPercentage: 0, // В вашей таблице нет этого поля
         status: game.status || 'playing',
-        lastPlayed: game.last_played ? new Date(game.last_played).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        lastPlayed: game.last_played
+          ? new Date(game.last_played).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
         notes: game.notes || '',
         createdAt: game.created_at || new Date().toISOString(),
         updatedAt: game.updated_at || new Date().toISOString(),
@@ -149,7 +158,10 @@ export const fetchUserGames = createAsyncThunk(
 // Асинхронный thunk для добавления игры
 export const addUserGame = createAsyncThunk(
   'profile/addGame',
-  async ({ userId, gameData }: { userId: string; gameData: AddGameData }, { rejectWithValue, getState }) => {
+  async (
+    { userId, gameData }: { userId: string; gameData: AddGameData },
+    { rejectWithValue, getState }
+  ) => {
     try {
       const state = getState() as RootState;
       const allGames = selectAllGames(state);
@@ -189,7 +201,9 @@ export const addUserGame = createAsyncThunk(
         totalAchievements: 0, // Нужно получить из таблицы игр или добавить поле
         completionPercentage: 0, // Можно рассчитать
         status: data.status,
-        lastPlayed: data.last_played ? new Date(data.last_played).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        lastPlayed: data.last_played
+          ? new Date(data.last_played).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0],
         notes: data.notes || '',
         createdAt: data.created_at,
         updatedAt: data.updated_at,
@@ -206,11 +220,14 @@ export const addUserGame = createAsyncThunk(
 // Асинхронный thunk для обновления игры
 export const updateUserGame = createAsyncThunk(
   'profile/updateGame',
-  async ({ gameId, updateData }: { gameId: string; updateData: UpdateGameData }, { rejectWithValue, getState }) => {
+  async (
+    { gameId, updateData }: { gameId: string; updateData: UpdateGameData },
+    { rejectWithValue, getState }
+  ) => {
     try {
       const state = getState() as RootState;
       const userGame = selectUserGameById(gameId)(state);
-      
+
       if (!userGame) {
         throw new Error('Игра не найдена');
       }
@@ -221,9 +238,12 @@ export const updateUserGame = createAsyncThunk(
         .update({
           user_rating: updateData.userRating ?? userGame.userRating,
           hours_played: updateData.hoursPlayed ?? userGame.hoursPlayed,
-          achievements_completed: updateData.achievementsCompleted ?? userGame.achievementsCompleted,
+          achievements_completed:
+            updateData.achievementsCompleted ?? userGame.achievementsCompleted,
           status: updateData.status ?? userGame.status,
-          last_played: updateData.lastPlayed ? new Date(updateData.lastPlayed).toISOString() : userGame.lastPlayed,
+          last_played: updateData.lastPlayed
+            ? new Date(updateData.lastPlayed).toISOString()
+            : userGame.lastPlayed,
           notes: updateData.notes ?? userGame.notes,
           updated_at: new Date().toISOString(),
         })
@@ -233,12 +253,12 @@ export const updateUserGame = createAsyncThunk(
 
       if (error) throw error;
 
-      return { 
-        gameId, 
+      return {
+        gameId,
         updateData: {
           ...updateData,
           updatedAt: data.updated_at,
-        } 
+        },
       };
     } catch (error: any) {
       console.error('Ошибка при обновлении игры:', error);
@@ -252,10 +272,7 @@ export const removeUserGame = createAsyncThunk(
   'profile/removeGame',
   async (gameId: string, { rejectWithValue }) => {
     try {
-      const { error } = await supabase
-        .from('user_games')
-        .delete()
-        .eq('id', gameId);
+      const { error } = await supabase.from('user_games').delete().eq('id', gameId);
 
       if (error) throw error;
 
@@ -277,7 +294,7 @@ const profileSlice = createSlice({
       const existing = state.userGames.find(
         game => game.gameId === action.payload.gameId && game.userId === action.payload.userId
       );
-      
+
       if (!existing) {
         state.userGames.unshift(action.payload);
         // Для расчета статистики нужны все игры, получаем их из состояния
@@ -286,12 +303,12 @@ const profileSlice = createSlice({
         state.stats = calculateStats(state.userGames, allGames);
       }
     },
-    
+
     // Синхронное обновление игры
     updateGame: (state, action: PayloadAction<{ gameId: string; updateData: UpdateGameData }>) => {
       const { gameId, updateData } = action.payload;
       const index = state.userGames.findIndex(game => game.id === gameId);
-      
+
       if (index !== -1) {
         state.userGames[index] = {
           ...state.userGames[index],
@@ -303,7 +320,7 @@ const profileSlice = createSlice({
         state.stats = calculateStats(state.userGames, allGames);
       }
     },
-    
+
     // Синхронное удаление игры
     removeGame: (state, action: PayloadAction<string>) => {
       state.userGames = state.userGames.filter(game => game.id !== action.payload);
@@ -311,28 +328,28 @@ const profileSlice = createSlice({
       const allGames = selectAllGames(stateRoot);
       state.stats = calculateStats(state.userGames, allGames);
     },
-    
+
     // Обновление статистики
     updateStats: (state, action: PayloadAction<Partial<ProfileStats>>) => {
       state.stats = { ...state.stats, ...action.payload };
     },
-    
+
     // Очистка ошибок
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
-    
+
     // Сброс профиля (при выходе)
-    resetProfile: (state) => {
+    resetProfile: state => {
       state.userGames = [];
       state.stats = initialStats;
       state.error = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Загрузка игр пользователя
-      .addCase(fetchUserGames.pending, (state) => {
+      .addCase(fetchUserGames.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -348,9 +365,9 @@ const profileSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      
+
       // Добавление игры
-      .addCase(addUserGame.pending, (state) => {
+      .addCase(addUserGame.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -371,16 +388,16 @@ const profileSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      
+
       // Обновление игры
-      .addCase(updateUserGame.pending, (state) => {
+      .addCase(updateUserGame.pending, state => {
         state.isLoading = true;
       })
       .addCase(updateUserGame.fulfilled, (state, action) => {
         state.isLoading = false;
         const { gameId, updateData } = action.payload;
         const index = state.userGames.findIndex(game => game.id === gameId);
-        
+
         if (index !== -1) {
           state.userGames[index] = {
             ...state.userGames[index],
@@ -395,9 +412,9 @@ const profileSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      
+
       // Удаление игры
-      .addCase(removeUserGame.pending, (state) => {
+      .addCase(removeUserGame.pending, state => {
         state.isLoading = true;
       })
       .addCase(removeUserGame.fulfilled, (state, action) => {
@@ -414,14 +431,8 @@ const profileSlice = createSlice({
   },
 });
 
-export const { 
-  addGame, 
-  updateGame, 
-  removeGame, 
-  updateStats, 
-  clearError, 
-  resetProfile 
-} = profileSlice.actions;
+export const { addGame, updateGame, removeGame, updateStats, clearError, resetProfile } =
+  profileSlice.actions;
 
 export default profileSlice.reducer;
 
@@ -440,52 +451,47 @@ export const selectAllGames = (state: RootState) => {
     console.warn('State.games is undefined');
     return [];
   }
-  
+
   // Проверяем, существует ли свойство games в state.games
   if (!state.games.games) {
     console.warn('State.games.games is undefined');
     return [];
   }
-  
+
   return state.games.games;
 };
 
 // Селектор для игры пользователя по ID игры
-export const selectUserGameByGameId = (gameId: string) => 
-  (state: RootState) => state.profile.userGames.find(game => game.gameId === gameId);
+export const selectUserGameByGameId = (gameId: string) => (state: RootState) =>
+  state.profile.userGames.find(game => game.gameId === gameId);
 
 // Селектор для игры пользователя по ID записи
-export const selectUserGameById = (userGameId: string) => 
-  (state: RootState) => state.profile.userGames.find(game => game.id === userGameId);
+export const selectUserGameById = (userGameId: string) => (state: RootState) =>
+  state.profile.userGames.find(game => game.id === userGameId);
 
 // Селектор для игр по статусу
-export const selectUserGamesByStatus = (status: UserGame['status']) =>
-  (state: RootState) => state.profile.userGames.filter(game => game.status === status);
+export const selectUserGamesByStatus = (status: UserGame['status']) => (state: RootState) =>
+  state.profile.userGames.filter(game => game.status === status);
 
 // Селектор для отфильтрованных игр (с пагинацией)
 export const selectPaginatedUserGames = (page: number, gamesPerPage: number) =>
-  createSelector(
-    [selectUserGames],
-    (userGames) => {
-      const startIndex = (page - 1) * gamesPerPage;
-      return userGames.slice(startIndex, startIndex + gamesPerPage);
-    }
-  );
+  createSelector([selectUserGames], userGames => {
+    const startIndex = (page - 1) * gamesPerPage;
+    return userGames.slice(startIndex, startIndex + gamesPerPage);
+  });
 
 // Селектор для общего количества игр пользователя
 export const selectTotalUserGames = createSelector(
   [selectUserGames],
-  (userGames) => userGames.length
+  userGames => userGames.length
 );
 
 // Селектор для последних игр
 export const selectRecentUserGames = (limit: number = 5) =>
-  createSelector(
-    [selectUserGames],
-    (userGames) => 
-      [...userGames]
-        .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime())
-        .slice(0, limit)
+  createSelector([selectUserGames], userGames =>
+    [...userGames]
+      .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime())
+      .slice(0, limit)
   );
 
 // Селектор для поиска игр пользователя с деталями игры
@@ -495,9 +501,11 @@ export const selectUserGamesWithDetails = createSelector(
     const gamesMap = new Map<string, Game>();
     allGames.forEach(game => gamesMap.set(game.id, game));
 
-    return userGames.map(userGame => ({
-      ...userGame,
-      game: gamesMap.get(userGame.gameId)
-    })).filter(item => item.game); // Фильтруем только те, у которых есть детали игры
+    return userGames
+      .map(userGame => ({
+        ...userGame,
+        game: gamesMap.get(userGame.gameId),
+      }))
+      .filter(item => item.game); // Фильтруем только те, у которых есть детали игры
   }
 );

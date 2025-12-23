@@ -2,10 +2,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { 
-  logoutUser, 
-  selectCurrentUser 
-} from '../store/slices/authSlice';
+import { logoutUser, selectCurrentUser } from '../store/slices/authSlice';
 import { fetchAllGames } from '../store/slices/gamesSlice'; // Добавили fetchAllGames
 import {
   // Селекторы
@@ -21,7 +18,7 @@ import {
   removeUserGame,
   // Типы
   AddGameData,
-  UpdateGameData
+  UpdateGameData,
 } from '../store/slices/profileSlice';
 import { UserGame } from '../types/profile';
 import { Game } from '../types/game';
@@ -44,18 +41,18 @@ const mockProfile = {
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  
+
   // Получаем данные из Redux
   const user = useAppSelector(selectCurrentUser);
   const allGames = useAppSelector((state: RootState) => state.games?.games || []);
   const userGames = useAppSelector(selectUserGames);
   const profileStats = useAppSelector(selectProfileStats);
   const isLoading = useAppSelector(selectProfileLoading);
-  
+
   // Refs для управления выпадающим списком
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Локальные состояния
   const [profile, setProfile] = useState(() => {
     if (user) {
@@ -63,7 +60,7 @@ const ProfilePage: React.FC = () => {
     }
     return mockProfile;
   });
-  
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editProfileForm, setEditProfileForm] = useState(profile);
   const [showAddGameForm, setShowAddGameForm] = useState(false);
@@ -78,9 +75,9 @@ const ProfilePage: React.FC = () => {
   const [editingGameId, setEditingGameId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  
+
   const gamesPerPage = 5;
-  
+
   // Селектор для пагинированных игр
   const currentGames = useAppSelector(selectPaginatedUserGames(currentPage, gamesPerPage));
   const totalUserGames = useAppSelector(selectTotalUserGames);
@@ -98,10 +95,10 @@ const ProfilePage: React.FC = () => {
     if (user) {
       setProfile(prev => ({ ...prev, ...user }));
       setEditProfileForm(prev => ({ ...prev, ...user }));
-      
+
       // Загружаем игры пользователя
       dispatch(fetchUserGames(user.id));
-      
+
       // Загружаем ВСЕ игры для поиска
       dispatch(fetchAllGames());
     }
@@ -125,10 +122,14 @@ const ProfilePage: React.FC = () => {
   // Фильтрация игр для поиска (исключаем уже добавленные)
   const filteredGames = useMemo(() => {
     if (!searchQuery || editingGameId) return [];
-    
+
     return allGames.filter((game: Game) => {
-      const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           (game.genres && game.genres.some((genre: string) => genre.toLowerCase().includes(searchQuery.toLowerCase())));
+      const matchesSearch =
+        game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (game.genres &&
+          game.genres.some((genre: string) =>
+            genre.toLowerCase().includes(searchQuery.toLowerCase())
+          ));
       const notInCollection = !userGames.some(userGame => userGame.gameId === game.id);
       return matchesSearch && notInCollection;
     });
@@ -151,7 +152,7 @@ const ProfilePage: React.FC = () => {
   const handleSaveProfile = () => {
     setProfile(editProfileForm);
     setIsEditingProfile(false);
-    
+
     // TODO: Добавить обновление профиля через API
     console.log('Обновление профиля:', editProfileForm);
   };
@@ -182,7 +183,7 @@ const ProfilePage: React.FC = () => {
     setSearchQuery(game.title);
     setShowSearchResults(false);
     setIsSearchFocused(false);
-    
+
     // Фокус на следующий элемент формы
     setTimeout(() => {
       if (searchInputRef.current) {
@@ -194,7 +195,7 @@ const ProfilePage: React.FC = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    
+
     // Если начали новый поиск, сбрасываем выбранную игру
     if (selectedGame && selectedGame.title !== value) {
       setSelectedGame(null);
@@ -217,7 +218,7 @@ const ProfilePage: React.FC = () => {
 
   const handleAddGame = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedGame || !user) {
       alert('Пожалуйста, выберите игру');
       return;
@@ -241,7 +242,7 @@ const ProfilePage: React.FC = () => {
 
     try {
       await dispatch(addUserGame({ userId: user.id, gameData })).unwrap();
-      
+
       // Сброс формы
       resetGameForm();
       setShowAddGameForm(false);
@@ -273,7 +274,7 @@ const ProfilePage: React.FC = () => {
 
   const handleUpdateGame = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!selectedGame || !editingGameId) {
       alert('Ошибка редактирования');
       return;
@@ -288,11 +289,13 @@ const ProfilePage: React.FC = () => {
     };
 
     try {
-      await dispatch(updateUserGame({ 
-        gameId: editingGameId, 
-        updateData 
-      })).unwrap();
-      
+      await dispatch(
+        updateUserGame({
+          gameId: editingGameId,
+          updateData,
+        })
+      ).unwrap();
+
       // Сброс формы
       resetGameForm();
       setEditingGameId(null);
@@ -330,30 +333,46 @@ const ProfilePage: React.FC = () => {
 
   const getStatusColor = (status: UserGame['status']) => {
     switch (status) {
-      case 'completed': return '#2ecc71';
-      case 'playing': return '#3498db';
-      case 'on-hold': return '#f39c12';
-      case 'dropped': return '#e74c3c';
-      case 'planning': return '#9b59b6';
-      default: return '#95a5a6';
+      case 'completed':
+        return '#2ecc71';
+      case 'playing':
+        return '#3498db';
+      case 'on-hold':
+        return '#f39c12';
+      case 'dropped':
+        return '#e74c3c';
+      case 'planning':
+        return '#9b59b6';
+      default:
+        return '#95a5a6';
     }
   };
 
   const getStatusText = (status: UserGame['status']) => {
     switch (status) {
-      case 'completed': return 'Завершена';
-      case 'playing': return 'В процессе';
-      case 'on-hold': return 'На паузе';
-      case 'dropped': return 'Брошена';
-      case 'planning': return 'В планах';
-      default: return 'Неизвестно';
+      case 'completed':
+        return 'Завершена';
+      case 'playing':
+        return 'В процессе';
+      case 'on-hold':
+        return 'На паузе';
+      case 'dropped':
+        return 'Брошена';
+      case 'planning':
+        return 'В планах';
+      default:
+        return 'Неизвестно';
     }
   };
 
-  const renderStars = (rating: number, interactive = false, onStarClick?: (rating: number) => void) => {
+  const renderStars = (
+    rating: number,
+    interactive = false,
+    onStarClick?: (rating: number) => void
+  ) => {
     return (
       <div className={styles.stars}>
-        {[1, 2, 3, 4, 5].map((star) => (
+        {[1, 2, 3, 4, 5].map(star => (
           <span
             key={star}
             className={`${styles.star} ${star <= rating ? styles.active : ''}`}
@@ -384,9 +403,9 @@ const ProfilePage: React.FC = () => {
         >
           ← Назад
         </button>
-        
+
         <div className={styles.pageNumbers}>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <button
               key={page}
               className={`${styles.pageNumber} ${currentPage === page ? styles.active : ''}`}
@@ -396,7 +415,7 @@ const ProfilePage: React.FC = () => {
             </button>
           ))}
         </div>
-        
+
         <button
           className={styles.pageButton}
           onClick={() => handlePageChange(currentPage + 1)}
@@ -436,7 +455,7 @@ const ProfilePage: React.FC = () => {
                 <img src={profile.avatarUrl} alt={profile.username} />
                 <div className={`${styles.avatarStatus} ${styles.online}`} />
               </div>
-              
+
               <div className={styles.profileInfo}>
                 {isEditingProfile ? (
                   <div className={styles.editForm}>
@@ -463,7 +482,7 @@ const ProfilePage: React.FC = () => {
                     <p className={styles.profileTag}>{profile.tag}</p>
                   </>
                 )}
-                
+
                 <div className={styles.profileStats}>
                   <div className={styles.profileStat}>
                     <span className={styles.statValue}>{profile.level}</span>
@@ -479,7 +498,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.profileActions}>
                 {isEditingProfile ? (
                   <div className={styles.editActions}>
@@ -495,8 +514,8 @@ const ProfilePage: React.FC = () => {
                     <button className={styles.btnEdit} onClick={handleEditProfile}>
                       Редактировать профиль
                     </button>
-                    <button 
-                      className={styles.btnLogout} 
+                    <button
+                      className={styles.btnLogout}
                       onClick={handleLogout}
                       title="Выйти из аккаунта"
                     >
@@ -519,18 +538,14 @@ const ProfilePage: React.FC = () => {
             <div className={styles.statItem}>
               <div className={styles.statIcon}>🏆</div>
               <div>
-                <div className={styles.statNumber}>
-                  {profileStats.achievementsCompleted}
-                </div>
+                <div className={styles.statNumber}>{profileStats.achievementsCompleted}</div>
                 <div className={styles.statLabel}>Достижения</div>
               </div>
             </div>
             <div className={styles.statItem}>
               <div className={styles.statIcon}>⭐</div>
               <div>
-                <div className={styles.statNumber}>
-                  {profileStats.averageRating.toFixed(1)}
-                </div>
+                <div className={styles.statNumber}>{profileStats.averageRating.toFixed(1)}</div>
                 <div className={styles.statLabel}>Средняя оценка</div>
               </div>
             </div>
@@ -547,7 +562,7 @@ const ProfilePage: React.FC = () => {
           <div className={styles.addGameSection}>
             <div className={styles.sectionHeader}>
               <h3>Моя игровая коллекция ({profileStats.totalGames} игр)</h3>
-              <button 
+              <button
                 className={styles.btnAddGame}
                 onClick={() => {
                   resetGameForm();
@@ -559,11 +574,14 @@ const ProfilePage: React.FC = () => {
             </div>
 
             {showAddGameForm && (
-              <form className={styles.addGameForm} onSubmit={editingGameId ? handleUpdateGame : handleAddGame}>
+              <form
+                className={styles.addGameForm}
+                onSubmit={editingGameId ? handleUpdateGame : handleAddGame}
+              >
                 <div className={styles.formHeader}>
                   <h4>{editingGameId ? 'Редактировать игру' : 'Добавить новую игру'}</h4>
                 </div>
-                
+
                 <div className={styles.formRow}>
                   <div className={styles.formGroup} ref={searchRef}>
                     <label htmlFor="gameSearch">Поиск игры *</label>
@@ -582,19 +600,23 @@ const ProfilePage: React.FC = () => {
                         disabled={!!editingGameId}
                         required
                       />
-                      
+
                       {showSearchResults && filteredGames.length > 0 && (
                         <div className={styles.searchResults}>
                           {filteredGames.slice(0, 5).map((game: Game) => (
                             <div
                               key={game.id}
                               className={`${styles.searchResultItem} ${selectedGame?.id === game.id ? styles.selected : ''}`}
-                              onMouseDown={(e) => {
+                              onMouseDown={e => {
                                 e.preventDefault(); // Предотвращаем blur на input
                                 handleGameSelect(game);
                               }}
                             >
-                              <img src={game.image_url} alt={game.title} className={styles.searchResultImage} />
+                              <img
+                                src={game.image_url}
+                                alt={game.title}
+                                className={styles.searchResultImage}
+                              />
                               <div className={styles.searchResultInfo}>
                                 <h4>{game.title}</h4>
                                 <p>{game.genres?.join(', ') || 'Жанры не указаны'}</p>
@@ -603,14 +625,17 @@ const ProfilePage: React.FC = () => {
                           ))}
                         </div>
                       )}
-                      
-                      {searchQuery && !showSearchResults && filteredGames.length === 0 && !editingGameId && (
-                        <div className={styles.searchResults}>
-                          <div className={styles.noResults}>
-                            Игра не найдена. Попробуйте другой запрос.
+
+                      {searchQuery &&
+                        !showSearchResults &&
+                        filteredGames.length === 0 &&
+                        !editingGameId && (
+                          <div className={styles.searchResults}>
+                            <div className={styles.noResults}>
+                              Игра не найдена. Попробуйте другой запрос.
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                   </div>
                 </div>
@@ -633,14 +658,14 @@ const ProfilePage: React.FC = () => {
                           <span className={styles.ratingValue}>{userRating}/5</span>
                         </div>
                       </div>
-                      
+
                       <div className={styles.formGroup}>
                         <label htmlFor="hoursPlayed">Часов наиграно *</label>
                         <input
                           id="hoursPlayed"
                           type="number"
                           value={hoursPlayed}
-                          onChange={(e) => setHoursPlayed(e.target.value)}
+                          onChange={e => setHoursPlayed(e.target.value)}
                           min="0"
                           max="9999"
                           className={styles.numberInput}
@@ -658,7 +683,7 @@ const ProfilePage: React.FC = () => {
                             id="achievements"
                             type="number"
                             value={achievementsCompleted}
-                            onChange={(e) => setAchievementsCompleted(e.target.value)}
+                            onChange={e => setAchievementsCompleted(e.target.value)}
                             min="0"
                             max={selectedGame.achievements || 999}
                             className={styles.numberInput}
@@ -669,13 +694,13 @@ const ProfilePage: React.FC = () => {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className={styles.formGroup}>
                         <label htmlFor="status">Статус *</label>
                         <select
                           id="status"
                           value={gameStatus}
-                          onChange={(e) => setGameStatus(e.target.value as UserGame['status'])}
+                          onChange={e => setGameStatus(e.target.value as UserGame['status'])}
                           className={styles.statusSelect}
                           required
                         >
@@ -704,7 +729,7 @@ const ProfilePage: React.FC = () => {
                       <textarea
                         id="notes"
                         value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        onChange={e => setNotes(e.target.value)}
                         className={styles.notesInput}
                         placeholder="Ваши впечатления, комментарии, планы..."
                         rows={3}
@@ -715,8 +740,8 @@ const ProfilePage: React.FC = () => {
                       <button type="submit" className={styles.btnSubmit}>
                         {editingGameId ? 'Сохранить изменения' : 'Добавить в коллекцию'}
                       </button>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className={styles.btnCancelForm}
                         onClick={() => {
                           resetGameForm();
@@ -741,22 +766,33 @@ const ProfilePage: React.FC = () => {
             {userGames.length > 0 ? (
               <>
                 <div className={styles.userGamesList}>
-                  {currentGames.map((userGame) => {
+                  {currentGames.map(userGame => {
                     const game = gamesMap.get(userGame.gameId);
                     if (!game) return null;
 
                     return (
                       <div key={userGame.id} className={styles.userGameCard}>
                         <div className={styles.userGameHeader}>
-                          <img src={game.image_url} alt={game.title} className={styles.userGameImage} />
+                          <img
+                            src={game.image_url}
+                            alt={game.title}
+                            className={styles.userGameImage}
+                          />
                           <div className={styles.userGameInfo}>
                             <h4>{game.title}</h4>
                             <div className={styles.userGameMeta}>
-                              <span className={styles.userGameStatus} style={{ backgroundColor: getStatusColor(userGame.status) }}>
+                              <span
+                                className={styles.userGameStatus}
+                                style={{ backgroundColor: getStatusColor(userGame.status) }}
+                              >
                                 {getStatusText(userGame.status)}
                               </span>
-                              <span className={styles.userGameHours}>🕐 {userGame.hoursPlayed} ч</span>
-                              <span className={styles.userGameAchievements}>🏆 {userGame.achievementsCompleted}/{userGame.totalAchievements}</span>
+                              <span className={styles.userGameHours}>
+                                🕐 {userGame.hoursPlayed} ч
+                              </span>
+                              <span className={styles.userGameAchievements}>
+                                🏆 {userGame.achievementsCompleted}/{userGame.totalAchievements}
+                              </span>
                             </div>
                           </div>
                           <div className={styles.userGameActions}>
@@ -776,32 +812,35 @@ const ProfilePage: React.FC = () => {
                             </button>
                           </div>
                         </div>
-                        
+
                         <div className={styles.userGameDetails}>
                           <div className={styles.userGameRating}>
                             <span>Ваша оценка:</span>
                             {renderStars(userGame.userRating)}
                           </div>
-                          
+
                           <div className={styles.userGameProgress}>
                             <div className={styles.progressBar}>
-                              <div 
+                              <div
                                 className={styles.progressFill}
                                 style={{ width: `${userGame.completionPercentage}%` }}
                               />
                             </div>
-                            <span className={styles.progressText}>{userGame.completionPercentage}% завершено</span>
+                            <span className={styles.progressText}>
+                              {userGame.completionPercentage}% завершено
+                            </span>
                           </div>
-                          
+
                           {userGame.notes && (
                             <div className={styles.userGameNotes}>
                               <p>{userGame.notes}</p>
                             </div>
                           )}
-                          
+
                           <div className={styles.userGameFooter}>
                             <span className={styles.lastPlayed}>
-                              Последняя игра: {new Date(userGame.lastPlayed).toLocaleDateString('ru-RU')}
+                              Последняя игра:{' '}
+                              {new Date(userGame.lastPlayed).toLocaleDateString('ru-RU')}
                             </span>
                           </div>
                         </div>
@@ -833,11 +872,11 @@ const ProfilePage: React.FC = () => {
                 <div className={styles.playerAvatar}>
                   <img src={profile.avatarUrl} alt="Аватар игрока" />
                 </div>
-                
+
                 <div className={styles.playerInfo}>
                   <h3>{profile.username}</h3>
                   <p className={styles.playerTag}>{profile.tag}</p>
-                  
+
                   <div className={styles.playerStats}>
                     <div className={styles.stat}>
                       <div className={styles.statValue}>{profileStats.totalGames}</div>
@@ -848,44 +887,42 @@ const ProfilePage: React.FC = () => {
                       <div className={styles.statLabel}>Часов</div>
                     </div>
                     <div className={styles.stat}>
-                      <div className={styles.statValue}>
-                        {profileStats.gamesByStatus.completed}
-                      </div>
+                      <div className={styles.statValue}>{profileStats.gamesByStatus.completed}</div>
                       <div className={styles.statLabel}>Завершено</div>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className={styles.dnaStats}>
                 <div className={styles.dnaMetric}>
                   <h4>Исследователь</h4>
                   <div className={styles.dnaProgress}>
-                    <div 
+                    <div
                       className={`${styles.progressFill} ${styles.explorer}`}
                       style={{ width: `${Math.min(100, profileStats.totalGames * 15)}%` }}
                     />
                     <span>{Math.min(100, profileStats.totalGames * 15)}%</span>
                   </div>
                 </div>
-                
+
                 <div className={styles.dnaMetric}>
                   <h4>Комплетионист</h4>
                   <div className={styles.dnaProgress}>
-                    <div 
+                    <div
                       className={`${styles.progressFill} ${styles.completionist}`}
-                      style={{ 
-                        width: `${profileStats.completionRate}%` 
+                      style={{
+                        width: `${profileStats.completionRate}%`,
                       }}
                     />
                     <span>{profileStats.completionRate.toFixed(0)}%</span>
                   </div>
                 </div>
-                
+
                 <div className={styles.dnaMetric}>
                   <h4>Хардкорный геймер</h4>
                   <div className={styles.dnaProgress}>
-                    <div 
+                    <div
                       className={`${styles.progressFill} ${styles.hardcore}`}
                       style={{ width: `${Math.min(100, profileStats.totalHours / 15)}%` }}
                     />

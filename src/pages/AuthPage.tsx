@@ -17,14 +17,9 @@ const AuthPage = () => {
     <div className="auth-page">
       <div className="auth-container">
         {isLogin ? (
-          <LoginForm 
-            switchToRegister={() => setIsLogin(false)}
-          />
+          <LoginForm switchToRegister={() => setIsLogin(false)} />
         ) : (
-          <RegisterForm 
-            onSuccess={handleAuthSuccess}
-            switchToLogin={() => setIsLogin(true)}
-          />
+          <RegisterForm onSuccess={handleAuthSuccess} switchToLogin={() => setIsLogin(true)} />
         )}
       </div>
     </div>

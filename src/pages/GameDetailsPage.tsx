@@ -2,29 +2,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { 
-  fetchGameById, 
-  selectCurrentGame, 
-  selectGamesLoading
-} from '../store/slices/gamesSlice';
-import { 
-  toggleFavorite, 
+import { fetchGameById, selectCurrentGame, selectGamesLoading } from '../store/slices/gamesSlice';
+import {
+  toggleFavorite,
   toggleFavoriteSync,
-  selectIsFavorite 
+  selectIsFavorite,
 } from '../store/slices/favoritesSlice';
 import styles from './GameDetailsPage.module.css';
 
 const GameDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  
+
   const game = useAppSelector(selectCurrentGame);
   const isLoading = useAppSelector(selectGamesLoading);
   const isFavorite = useAppSelector(selectIsFavorite(id || ''));
-  
+
   const [activeTab, setActiveTab] = useState<'min' | 'rec'>('min');
   const [activeImage, setActiveImage] = useState(0);
-  
+
   useEffect(() => {
     if (id) {
       dispatch(fetchGameById(id));
@@ -35,12 +31,14 @@ const GameDetailsPage: React.FC = () => {
     if (game) {
       // Используем thunk для асинхронного переключения
       dispatch(toggleFavorite({ game, isFavorite: !!isFavorite }));
-      
+
       // И синхронное обновление для мгновенной обратной связи
-      dispatch(toggleFavoriteSync({ 
-        game, 
-        isFavorite: !!isFavorite 
-      }));
+      dispatch(
+        toggleFavoriteSync({
+          game,
+          isFavorite: !!isFavorite,
+        })
+      );
     }
   };
 
@@ -115,7 +113,11 @@ const GameDetailsPage: React.FC = () => {
             <div className={`${styles.contentSection} ${styles.descriptionSection}`}>
               <h2>Описание</h2>
               <p>{game.description}</p>
-              <p>Взойдите на трон и станьте Повелителем Колец в мире, где мифы и легенды оживают. Исследуйте обширные земли, сражайтесь с могущественными противниками и открывайте тайны этого загадочного мира.</p>
+              <p>
+                Взойдите на трон и станьте Повелителем Колец в мире, где мифы и легенды оживают.
+                Исследуйте обширные земли, сражайтесь с могущественными противниками и открывайте
+                тайны этого загадочного мира.
+              </p>
             </div>
 
             <div className={`${styles.contentSection} ${styles.requirementsSection}`}>
@@ -134,7 +136,7 @@ const GameDetailsPage: React.FC = () => {
                   Рекомендуемые
                 </button>
               </div>
-              
+
               <div className={`${styles.reqSpecs} ${activeTab === 'min' ? styles.active : ''}`}>
                 <div className={styles.specItem}>
                   <strong>ОС:</strong> Windows 10
@@ -152,7 +154,7 @@ const GameDetailsPage: React.FC = () => {
                   <strong>Место на диске:</strong> 60 GB
                 </div>
               </div>
-              
+
               <div className={`${styles.reqSpecs} ${activeTab === 'rec' ? styles.active : ''}`}>
                 <div className={styles.specItem}>
                   <strong>ОС:</strong> Windows 10/11
@@ -223,7 +225,11 @@ const GameDetailsPage: React.FC = () => {
               </div>
               <div className={styles.metaItem}>
                 <span>Дата выхода</span>
-                <span>{game.release_date ? new Date(game.release_date).toLocaleDateString('ru-RU') : 'Не указана'}</span>
+                <span>
+                  {game.release_date
+                    ? new Date(game.release_date).toLocaleDateString('ru-RU')
+                    : 'Не указана'}
+                </span>
               </div>
               <div className={styles.metaItem}>
                 <span>Разработчик</span>

@@ -3,24 +3,24 @@ export interface UserGame {
   id: string; // UUID
   gameId: string; // UUID - Ссылка на основную таблицу игр
   userId: string; // UUID - Ссылка на пользователя
-  
+
   // Данные пользователя об игре
   userRating: number; // 1-5
   hoursPlayed: number;
   achievementsCompleted: number;
   totalAchievements: number;
   completionPercentage: number;
-  
+
   // Статус игры
   status: 'playing' | 'completed' | 'on-hold' | 'dropped' | 'planning';
-  
+
   // Дополнительная информация
   lastPlayed: string; // ISO дата (YYYY-MM-DD)
   notes?: string;
   purchaseDate?: string;
   purchasePrice?: number;
   platform?: string; // На какой платформе играет пользователь
-  
+
   // Метаданные
   createdAt: string;
   updatedAt: string;
