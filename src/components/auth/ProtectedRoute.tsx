@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.tsx
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';

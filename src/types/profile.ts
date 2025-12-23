@@ -1,8 +1,8 @@
 // src/types/profile.ts
 export interface UserGame {
-  id: number;
-  gameId: number; // Ссылка на основную таблицу игр
-  userId: string; // Ссылка на пользователя
+  id: string; // UUID
+  gameId: string; // UUID - Ссылка на основную таблицу игр
+  userId: string; // UUID - Ссылка на пользователя
   
   // Данные пользователя об игре
   userRating: number; // 1-5
@@ -15,7 +15,7 @@ export interface UserGame {
   status: 'playing' | 'completed' | 'on-hold' | 'dropped' | 'planning';
   
   // Дополнительная информация
-  lastPlayed: string; // ISO дата
+  lastPlayed: string; // ISO дата (YYYY-MM-DD)
   notes?: string;
   purchaseDate?: string;
   purchasePrice?: number;
@@ -52,7 +52,7 @@ export interface ProfileState {
 }
 
 export interface AddGameData {
-  gameId: number;
+  gameId: string; // Изменено с number на string (UUID)
   userRating?: number;
   hoursPlayed?: number;
   achievementsCompleted?: number;

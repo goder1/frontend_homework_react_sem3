@@ -1,236 +1,277 @@
 // src/store/slices/gamesSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { Game, FilterState, Platform } from '../../types/game';
-import { RootState } from '..';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { supabase } from '../../lib/supabaseClient';
+
+// Типы
+export interface Game {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  rating: number;
+  price: number;
+  release_date: string;
+  achievements?: number;
+  platforms?: string[]; // Упростим для profileSlice
+  genres?: string[];    // Упростим для profileSlice
+}
+
+export interface GameWithRelations {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  rating: number;
+  price: number;
+  release_date: string;
+  achievements?: number;
+  platforms?: Array<{
+    platforms: {
+      id: string;
+      name: string;
+    }
+  }>;
+  genres?: Array<{
+    genres: {
+      id: string;
+      name: string;
+    }
+  }>;
+}
+
+export type PlatformType = 'PC' | 'PlayStation' | 'Xbox' | 'Nintendo Switch';
+export type SortByType = 'rating' | 'release_date' | 'title' | 'popular' | 'newest';
+export type FilterState = {
+  platforms: string[];
+  genres: string[];
+  sortBy: SortByType;
+  searchQuery: string;
+};
 
 interface GamesState {
   games: Game[];
-  filteredGames: Game[];
-  filters: FilterState;
-  isLoading: boolean;
+  featuredGames: Game[];
+  newReleases: Game[];
+  currentGame: Game | null;
+  loading: boolean;
   error: string | null;
-  selectedGame: Game | null;
+  total: number;
+  page: number;
+  limit: number;
+  filters: FilterState;
+  allPlatforms: string[];
+  allGenres: string[];
 }
 
-// Вспомогательная функция для фильтрации
-const applyFilters = (games: Game[], filters: FilterState): Game[] => {
-  let result = [...games];
-
-  // Поиск
-  if (filters.searchQuery) {
-    const query = filters.searchQuery.toLowerCase();
-    result = result.filter(game =>
-      game.title.toLowerCase().includes(query) ||
-      game.description.toLowerCase().includes(query) ||
-      game.genres.some(genre => genre.toLowerCase().includes(query))
-    );
-  }
-
-  // Платформы
-  if (filters.platforms.length > 0) {
-    result = result.filter(game =>
-      filters.platforms.some(platform => game.platforms.includes(platform))
-    );
-  }
-
-  // Жанры
-  if (filters.genres.length > 0) {
-    result = result.filter(game =>
-      filters.genres.some(genre => game.genres.includes(genre))
-    );
-  }
-
-  // Сортировка
-  switch (filters.sortBy) {
-    case 'rating':
-      result.sort((a, b) => b.rating - a.rating);
-      break;
-    case 'newest':
-      result.sort((a, b) => 
-        new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
-      );
-      break;
-    case 'release':
-      result.sort((a, b) => 
-        new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime()
-      );
-      break;
-    case 'popular':
-    default:
-      // Можно добавить логику популярности на основе оценок/просмотров
-      break;
-  }
-
-  return result;
-};
-
-// Моковые данные (будут заменены на данные из БД)
-const mockGames: Game[] = [
-  {
-    id: 1,
-    title: 'Cyberpunk 2077',
-    description: 'Научно-фантастическая RPG в открытом мире от создателей Ведьмака.',
-    rating: 4.5,
-    platforms: ['PC', 'PS5', 'Xbox'] as Platform[],
-    genres: ['RPG', 'Action'],
-    imageUrl: 'public/images/cyberpunk.png',
-    isFavorite: false,
-    releaseDate: '2020-12-10',
-  },
-  {
-    id: 2,
-    title: 'Elden Ring',
-    description: 'Фэнтезийная action-RPG от создателей Dark Souls.',
-    rating: 4.8,
-    platforms: ['PC', 'PS5', 'Xbox'] as Platform[],
-    genres: ['RPG', 'Action', 'Fantasy'],
-    imageUrl: 'public/images/elden.webp',
-    isFavorite: false,
-    releaseDate: '2022-02-25',
-  },
-  {
-    id: 3,
-    title: 'Starfield',
-    description: 'Следующая генерация RPG от Bethesda Game Studios.',
-    rating: 4.2,
-    platforms: ['PC', 'Xbox'] as Platform[],
-    genres: ['RPG', 'Sci-Fi'],
-    imageUrl: 'public/images/starfield.webp',
-    isFavorite: false,
-    releaseDate: '2023-09-06',
-  },
-  {
-    id: 4,
-    title: 'God of War Ragnarök',
-    description: 'Продолжение эпического приключения Кратоса и Атрея.',
-    rating: 4.9,
-    platforms: ['PS5'] as Platform[],
-    genres: ['Action', 'Adventure'],
-    imageUrl: 'public/images/god_of_war.webp',
-    isFavorite: false,
-    releaseDate: '2022-11-09',
-  },
-  {
-    id: 5,
-    title: 'Halo Infinite',
-    description: 'Возвращение легендарного Мастера Чифа.',
-    rating: 4.3,
-    platforms: ['PC', 'Xbox'] as Platform[],
-    genres: ['Action', 'FPS'],
-    imageUrl: 'public/images/halo.jpg',
-    isFavorite: false,
-    releaseDate: '2021-12-08',
-  },
-  {
-    id: 6,
-    title: 'Total War: Warhammer III',
-    description: 'Грандиозная стратегия в мире Warhammer Fantasy.',
-    rating: 4.6,
-    platforms: ['PC'] as Platform[],
-    genres: ['Strategy', 'Fantasy'],
-    imageUrl: 'public/images/total_war.jpg',
-    isFavorite: false,
-    releaseDate: '2022-02-17',
-  },
-  {
-    id: 7,
-    title: 'ARC Raiders',
-    description: 'В ARC Raiders вас ждет Поверхность, которой заправляют смертоносные машины.',
-    rating: 4.5,
-    platforms: ['PC', 'PS5', 'Xbox'] as Platform[],
-    genres: ['TPS', 'Action'],
-    imageUrl: 'public/images/arc_raiders.webp',
-    isFavorite: false,
-    releaseDate: '2024-01-01',
-  },
-  {
-    id: 8,
-    title: 'Hollow Knight: Silksong',
-    description: 'Эпическое продолжение удостоенной множества наград приключенческой игры.',
-    rating: 4.7,
-    platforms: ['PC', 'PS5', 'Xbox'] as Platform[],
-    genres: ['Metroidvania', 'Indie', 'Platformer'],
-    imageUrl: 'public/images/silksong.jpg',
-    isFavorite: false,
-    releaseDate: '2024-12-31',
-  },
-  {
-    id: 9,
-    title: 'Baldur\'s Gate 3',
-    description: 'Эпическая RPG с глубоким сюжетом и тактическими боями.',
-    rating: 4.9,
-    platforms: ['PC', 'PS5'] as Platform[],
-    genres: ['RPG', 'Strategy', 'Adventure'],
-    imageUrl: 'public/images/baldurs_gate.jpg',
-    isFavorite: false,
-    releaseDate: '2023-08-03',
-  },
-  {
-    id: 10,
-    title: 'The Witcher 3: Wild Hunt',
-    description: 'Эпическая RPG в мире фэнтези от CD Projekt Red.',
-    rating: 4.9,
-    platforms: ['PC', 'PS5', 'Xbox'] as Platform[],
-    genres: ['RPG', 'Action', 'Adventure'],
-    imageUrl: 'public/images/witcher3.jpg',
-    isFavorite: false,
-    releaseDate: '2015-05-19',
-  },
-];
-
 const initialState: GamesState = {
-  games: mockGames,
-  filteredGames: mockGames,
+  games: [],
+  featuredGames: [],
+  newReleases: [],
+  currentGame: null,
+  loading: false,
+  error: null,
+  total: 0,
+  page: 1,
+  limit: 12,
   filters: {
+    searchQuery: '',
     platforms: [],
     genres: [],
-    sortBy: 'popular',
-    searchQuery: '',
+    sortBy: 'popular'
   },
-  isLoading: false,
-  error: null,
-  selectedGame: null,
+  allPlatforms: ['PC', 'PlayStation', 'Xbox', 'Nintendo Switch'],
+  allGenres: ['Action', 'RPG', 'Strategy', 'Adventure', 'Shooter', 'Simulation', 'Sports', 'Horror', 'Indie', 'Fantasy', 'Sci-Fi']
 };
 
-// Асинхронный thunk для загрузки игр из БД
+// Вспомогательная функция для преобразования игры с отношениями в простую игру
+const transformGame = (gameWithRelations: GameWithRelations): Game => {
+  return {
+    id: gameWithRelations.id,
+    title: gameWithRelations.title,
+    description: gameWithRelations.description,
+    image_url: gameWithRelations.image_url,
+    rating: gameWithRelations.rating,
+    price: gameWithRelations.price,
+    release_date: gameWithRelations.release_date,
+    achievements: gameWithRelations.achievements,
+    platforms: gameWithRelations.platforms?.map(p => p.platforms.name),
+    genres: gameWithRelations.genres?.map(g => g.genres.name)
+  };
+};
+
+// Получение игр с фильтрами
 export const fetchGames = createAsyncThunk(
-  'games/fetchAll',
-  async (_, { rejectWithValue }) => {
+  'games/fetchGames',
+  async (_, { getState, rejectWithValue }) => {
     try {
-      // TODO: Заменить на реальный запрос к БД
-      // const response = await fetch('/api/games');
-      // const data = await response.json();
+      const state = getState() as { games: GamesState };
+      const { page, limit, filters } = state.games;
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      let query = supabase
+        .from('games')
+        .select(`
+          *,
+          platforms:game_platforms(platforms(*)),
+          genres:game_genres(genres(*))
+        `, { count: 'exact' });
+
+      // Поиск
+      if (filters.searchQuery) {
+        query = query.or(`title.ilike.%${filters.searchQuery}%,description.ilike.%${filters.searchQuery}%`);
+      }
+
+      // Сортировка
+      let sortBy: 'rating' | 'release_date' | 'title' = 'rating';
+      let sortOrder: 'asc' | 'desc' = 'desc';
       
-      // Имитация загрузки
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Пока возвращаем моковые данные
-      return mockGames;
+      switch (filters.sortBy) {
+        case 'popular':
+        case 'rating':
+          sortBy = 'rating';
+          sortOrder = 'desc';
+          break;
+        case 'newest':
+        case 'release':
+          sortBy = 'release_date';
+          sortOrder = 'desc';
+          break;
+        case 'title':
+          sortBy = 'title';
+          sortOrder = 'asc';
+          break;
+      }
+
+      query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+      // Пагинация
+      const { data: games, error, count } = await query.range(from, to);
+
+      if (error) throw error;
+
+      // Преобразуем данные
+      const transformedGames = games?.map(transformGame) || [];
+
+      return {
+        games: transformedGames,
+        total: count || 0
+      };
+
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка при загрузке игр');
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// Асинхронный thunk для получения игры по ID
+// Получение игры по ID
 export const fetchGameById = createAsyncThunk(
-  'games/fetchById',
-  async (id: number, { rejectWithValue }) => {
+  'games/fetchGameById',
+  async (id: string, { rejectWithValue }) => {
     try {
-      // TODO: Заменить на реальный запрос к БД
-      // const response = await fetch(`/api/games/${id}`);
-      // const data = await response.json();
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      const game = mockGames.find(g => g.id === id);
-      if (!game) {
-        throw new Error('Игра не найдена');
-      }
-      
-      return game;
+      const { data: game, error } = await supabase
+        .from('games')
+        .select(`
+          *,
+          platforms:game_platforms(platforms(*)),
+          genres:game_genres(genres(*))
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return transformGame(game);
+
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка при загрузке игры');
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Получение популярных игр (фичеред)
+export const fetchFeaturedGames = createAsyncThunk(
+  'games/fetchFeaturedGames',
+  async (limit: number = 6, { rejectWithValue }) => {
+    try {
+      console.log('Fetching featured games...');
+      const { data: games, error } = await supabase
+        .from('games')
+        .select(`
+          *,
+          platforms:game_platforms(platforms(*)),
+          genres:game_genres(genres(*))
+        `)
+        .order('rating', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('Error fetching featured games:', error);
+        throw error;
+      }
+      console.log('Raw featured games from Supabase:', games);
+      const transformedGames = games?.map(transformGame) || [];
+      console.log('Transformed featured games:', transformedGames);
+      return transformedGames;
+
+    } catch (error: any) {
+      console.error('Error in fetchFeaturedGames:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Получение новых релизов
+export const fetchNewReleases = createAsyncThunk(
+  'games/fetchNewReleases',
+  async (limit: number = 6, { rejectWithValue }) => {
+    try {
+      console.log('Fetching new releases...');
+      const { data: games, error } = await supabase
+        .from('games')
+        .select(`
+          *,
+          platforms:game_platforms(platforms(*)),
+          genres:game_genres(genres(*))
+        `)
+        .order('release_date', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('Error fetching new releases:', error);
+        throw error;
+      }
+      console.log('Raw new releases from Supabase:', games);
+      const transformedGames = games?.map(transformGame) || [];
+      console.log('Transformed new releases:', transformedGames);
+      return transformedGames;
+
+    } catch (error: any) {
+      console.error('Error in fetchNewReleases:', error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Получение ВСЕХ игр (без пагинации и фильтров)
+export const fetchAllGames = createAsyncThunk(
+  'games/fetchAllGames',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data: games, error } = await supabase
+        .from('games')
+        .select(`
+          *,
+          platforms:game_platforms(platforms(*)),
+          genres:game_genres(genres(*))
+        `)
+        .order('title', { ascending: true });
+
+      if (error) throw error;
+      const transformedGames = games?.map(transformGame) || [];
+      return transformedGames;
+
+    } catch (error: any) {
+      return rejectWithValue(error.message);
     }
   }
 );
@@ -239,173 +280,120 @@ const gamesSlice = createSlice({
   name: 'games',
   initialState,
   reducers: {
-    // Обновление фильтров
+    setPage: (state, action: PayloadAction<number>) => {
+      state.page = action.payload;
+    },
     updateFilters: (state, action: PayloadAction<Partial<FilterState>>) => {
       state.filters = { ...state.filters, ...action.payload };
-      state.filteredGames = applyFilters(state.games, state.filters);
+      state.page = 1; // Сбрасываем страницу при изменении фильтров
     },
-    
-    // Сброс фильтров
     resetFilters: (state) => {
       state.filters = initialState.filters;
-      state.filteredGames = state.games;
+      state.page = 1;
     },
-    
-    // Установка выбранной игры
-    setSelectedGame: (state, action: PayloadAction<Game | null>) => {
-      state.selectedGame = action.payload;
+    clearCurrentGame: (state) => {
+      state.currentGame = null;
     },
-    
-    // Обновление статуса избранного для игры
-    updateGameFavoriteStatus: (state, action: PayloadAction<{ id: number; isFavorite: boolean }>) => {
-      const { id, isFavorite } = action.payload;
-      
-      // Обновляем в основном массиве
-      const gameIndex = state.games.findIndex(g => g.id === id);
-      if (gameIndex !== -1) {
-        state.games[gameIndex].isFavorite = isFavorite;
-      }
-      
-      // Обновляем в отфильтрованном массиве
-      const filteredIndex = state.filteredGames.findIndex(g => g.id === id);
-      if (filteredIndex !== -1) {
-        state.filteredGames[filteredIndex].isFavorite = isFavorite;
-      }
-      
-      // Обновляем выбранную игру если она активна
-      if (state.selectedGame?.id === id) {
-        state.selectedGame.isFavorite = isFavorite;
-      }
-    },
-    
-    // Добавление новой игры (для админки)
-    addGame: (state, action: PayloadAction<Game>) => {
-      state.games.unshift(action.payload);
-      state.filteredGames = applyFilters(state.games, state.filters);
-    },
-    
-    // Обновление игры
-    updateGame: (state, action: PayloadAction<Game>) => {
-      const index = state.games.findIndex(g => g.id === action.payload.id);
-      if (index !== -1) {
-        state.games[index] = action.payload;
-        state.filteredGames = applyFilters(state.games, state.filters);
-      }
-    },
-    
-    // Удаление игры
-    removeGame: (state, action: PayloadAction<number>) => {
-      state.games = state.games.filter(g => g.id !== action.payload);
-      state.filteredGames = applyFilters(state.games, state.filters);
-    },
-    
-    // Очистка ошибок
-    clearError: (state) => {
-      state.error = null;
-    },
+    // Добавляем action для обновления списка всех игр
+    setAllGames: (state, action: PayloadAction<Game[]>) => {
+      state.games = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder
-      // Загрузка всех игр
+      // fetchGames
       .addCase(fetchGames.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(fetchGames.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.games = action.payload;
-        state.filteredGames = applyFilters(action.payload, state.filters);
+        state.loading = false;
+        state.games = action.payload.games;
+        state.total = action.payload.total;
       })
       .addCase(fetchGames.rejected, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
         state.error = action.payload as string;
       })
       
-      // Загрузка игры по ID
+      // fetchGameById
       .addCase(fetchGameById.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(fetchGameById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.selectedGame = action.payload;
+        state.loading = false;
+        state.currentGame = action.payload;
       })
       .addCase(fetchGameById.rejected, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      
+      // fetchFeaturedGames
+      .addCase(fetchFeaturedGames.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchFeaturedGames.fulfilled, (state, action) => {
+        state.loading = false;
+        state.featuredGames = action.payload;
+      })
+      .addCase(fetchFeaturedGames.rejected, (state) => {
+        state.loading = false;
+      })
+      
+      // fetchNewReleases
+      .addCase(fetchNewReleases.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchNewReleases.fulfilled, (state, action) => {
+        state.loading = false;
+        state.newReleases = action.payload;
+      })
+      .addCase(fetchNewReleases.rejected, (state) => {
+        state.loading = false;
+      })
+      
+      // fetchAllGames
+      .addCase(fetchAllGames.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllGames.fulfilled, (state, action) => {
+        state.loading = false;
+        state.games = action.payload;
+        state.total = action.payload.length;
+      })
+      .addCase(fetchAllGames.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as string;
       });
-  },
+  }
 });
 
-export const { 
-  updateFilters, 
-  resetFilters, 
-  setSelectedGame,
-  updateGameFavoriteStatus,
-  addGame, 
-  updateGame, 
-  removeGame, 
-  clearError 
+// Экспортируем actions
+export const {
+  setPage,
+  updateFilters,
+  resetFilters,
+  clearCurrentGame,
+  setAllGames
 } = gamesSlice.actions;
 
-export default gamesSlice.reducer;
-
 // Селекторы
-export const selectAllGames = (state: RootState) => state.games.games;
-export const selectFilteredGames = (state: RootState) => state.games.filteredGames;
-export const selectGamesFilters = (state: RootState) => state.games.filters;
-export const selectSelectedGame = (state: RootState) => state.games.selectedGame;
-export const selectGamesLoading = (state: RootState) => state.games.isLoading;
-export const selectGamesError = (state: RootState) => state.games.error;
+export const selectGames = (state: { games: GamesState }) => state.games.games;
+export const selectFeaturedGames = (state: { games: GamesState }) => state.games.featuredGames;
+export const selectNewReleases = (state: { games: GamesState }) => state.games.newReleases;
+export const selectCurrentGame = (state: { games: GamesState }) => state.games.currentGame;
+export const selectGamesLoading = (state: { games: GamesState }) => state.games.loading;
+export const selectGamesError = (state: { games: GamesState }) => state.games.error;
+export const selectGamesTotal = (state: { games: GamesState }) => state.games.total;
+export const selectGamesPage = (state: { games: GamesState }) => state.games.page;
+export const selectGamesFilters = (state: { games: GamesState }) => state.games.filters;
+export const selectAllPlatforms = (state: { games: GamesState }) => state.games.allPlatforms;
+export const selectAllGenres = (state: { games: GamesState }) => state.games.allGenres;
 
-// Селекторы для популярных игр
-export const selectPopularGames = createSelector(
-  [selectFilteredGames],
-  (filteredGames) => filteredGames.slice(0, 6)
-);
+// Новый селектор для получения всех игр (alias для selectGames)
+export const selectAllGames = (state: { games: GamesState }) => state.games.games;
 
-// Селекторы для новых релизов
-export const selectNewReleases = createSelector(
-  [selectAllGames],
-  (games) => [...games]
-    .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
-    .slice(0, 4)
-);
-
-// Селектор для игры по ID
-export const selectGameById = (id: number) => 
-  (state: RootState) => state.games.games.find(game => game.id === id);
-
-// Селектор для похожих игр (по жанрам)
-export const selectSimilarGames = (gameId: number, limit: number = 3) =>
-  createSelector(
-    [selectAllGames],
-    (games) => {
-      const game = games.find(g => g.id === gameId);
-      if (!game) return [];
-      
-      return games
-        .filter(g => g.id !== gameId && 
-          g.genres.some(genre => game.genres.includes(genre))
-        )
-        .slice(0, limit);
-    }
-  );
-
-// Селектор для всех уникальных жанров
-export const selectAllGenres = createSelector(
-  [selectAllGames],
-  (games) => {
-    const allGenres = games.flatMap(game => game.genres);
-    return Array.from(new Set(allGenres)).sort();
-  }
-);
-
-// Селектор для всех уникальных платформ
-export const selectAllPlatforms = createSelector(
-  [selectAllGames],
-  (games) => {
-    const allPlatforms = games.flatMap(game => game.platforms);
-    return Array.from(new Set(allPlatforms)).sort();
-  }
-);
+export default gamesSlice.reducer;

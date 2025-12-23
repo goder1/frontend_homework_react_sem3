@@ -3,11 +3,13 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
-  selectPopularGames, 
+  selectFeaturedGames, 
   selectNewReleases,
   selectGamesLoading,
   fetchGames,
-  updateFilters
+  updateFilters,
+  fetchFeaturedGames,
+  fetchNewReleases
 } from '../store/slices/gamesSlice';
 import GameFilters from '../components/games/GameFilters';
 import GameCard from '../components/games/GameCard';
@@ -22,9 +24,13 @@ const HomePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   
-  const popularGames = useAppSelector(selectPopularGames);
+  const popularGames = useAppSelector(selectFeaturedGames);
   const newReleases = useAppSelector(selectNewReleases);
   const isLoading = useAppSelector(selectGamesLoading);
+  
+  console.log('HomePage render - popularGames:', popularGames);
+  console.log('HomePage render - newReleases:', newReleases);
+  console.log('HomePage render - isLoading:', isLoading);
 
   // Обработчик фильтров
   const handleFilterChange = (filters: any) => {
@@ -33,6 +39,10 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchGames());
+    console.log('HomePage useEffect - fetching games...');
+    // Загружаем обе категории игр
+    dispatch(fetchFeaturedGames(6));
+    dispatch(fetchNewReleases(6));
   }, [dispatch]);
 
   // Обработка параметров из навигации

@@ -8,11 +8,11 @@ import {
   selectAllGenres,
   selectAllPlatforms 
 } from '../../store/slices/gamesSlice';
-import { FilterState, Platform } from '../../types/game';
+import { PlatformType } from '../../store/slices/gamesSlice';
 import styles from './GameFilters.module.css';
 
 interface GameFiltersProps {
-  onFilterChange?: (filters: FilterState) => void;
+  onFilterChange?: (filters: any) => void;
 }
 
 const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
@@ -21,7 +21,7 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
   const allGenres = useAppSelector(selectAllGenres);
   const allPlatforms = useAppSelector(selectAllPlatforms);
 
-  const handlePlatformToggle = (platform: Platform) => {
+  const handlePlatformToggle = (platform: PlatformType) => {
     const newPlatforms = filters.platforms.includes(platform)
       ? filters.platforms.filter(p => p !== platform)
       : [...filters.platforms, platform];
@@ -39,7 +39,7 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
     onFilterChange?.({ ...filters, genres: newGenres });
   };
 
-  const handleSortChange = (sortBy: FilterState['sortBy']) => {
+  const handleSortChange = (sortBy: any) => {
     dispatch(updateFilters({ sortBy }));
     onFilterChange?.({ ...filters, sortBy });
   };
@@ -81,9 +81,9 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
                   <button
                     key={platform}
                     className={`${styles.platformBtn} ${
-                      filters.platforms.includes(platform as Platform) ? styles.active : ''
+                      filters.platforms.includes(platform as PlatformType) ? styles.active : ''
                     }`}
-                    onClick={() => handlePlatformToggle(platform as Platform)}
+                    onClick={() => handlePlatformToggle(platform as PlatformType)}
                   >
                     {platform}
                   </button>
@@ -130,10 +130,10 @@ const GameFilters: React.FC<GameFiltersProps> = ({ onFilterChange }) => {
                   Новинки
                 </button>
                 <button
-                  className={`${styles.sortBtn} ${filters.sortBy === 'release' ? styles.active : ''}`}
-                  onClick={() => handleSortChange('release')}
+                  className={`${styles.sortBtn} ${filters.sortBy === 'title' ? styles.active : ''}`}
+                  onClick={() => handleSortChange('title')}
                 >
-                  Дате выхода
+                  По названию
                 </button>
               </div>
             </div>

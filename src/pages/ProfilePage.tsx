@@ -6,9 +6,7 @@ import {
   logoutUser, 
   selectCurrentUser 
 } from '../store/slices/authSlice';
-import { 
-  selectAllGames
-} from '../store/slices/gamesSlice';
+import { selectAllGames, fetchAllGames } from '../store/slices/gamesSlice'; // Добавили fetchAllGames
 import {
   // Селекторы
   selectUserGames,
@@ -78,7 +76,7 @@ const ProfilePage: React.FC = () => {
   const [achievementsCompleted, setAchievementsCompleted] = useState('');
   const [gameStatus, setGameStatus] = useState<UserGame['status']>('playing');
   const [notes, setNotes] = useState('');
-  const [editingGameId, setEditingGameId] = useState<number | null>(null);
+  const [editingGameId, setEditingGameId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   
@@ -91,7 +89,7 @@ const ProfilePage: React.FC = () => {
 
   // Создаем мемоизированный объект для быстрого поиска игр
   const gamesMap = useMemo(() => {
-    const map = new Map<number, Game>();
+    const map = new Map<string, Game>();
     allGames.forEach(game => map.set(game.id, game));
     return map;
   }, [allGames]);
@@ -104,6 +102,9 @@ const ProfilePage: React.FC = () => {
       
       // Загружаем игры пользователя
       dispatch(fetchUserGames(user.id));
+      
+      // Загружаем ВСЕ игры для поиска
+      dispatch(fetchAllGames());
     }
   }, [user, dispatch]);
 
@@ -128,7 +129,7 @@ const ProfilePage: React.FC = () => {
     
     return allGames.filter(game => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           game.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase()));
+                           (game.genres && game.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())));
       const notInCollection = !userGames.some(userGame => userGame.gameId === game.id);
       return matchesSearch && notInCollection;
     });
@@ -177,7 +178,7 @@ const ProfilePage: React.FC = () => {
   };
 
   const handleGameSelect = (game: Game) => {
-    console.log('Выбрана игра:', game.title, game.id); // Для отладки
+    console.log('Выбрана игра:', game.title, game.id);
     setSelectedGame(game);
     setSearchQuery(game.title);
     setShowSearchResults(false);
@@ -218,13 +219,6 @@ const ProfilePage: React.FC = () => {
   const handleAddGame = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Проверка перед добавлением:', { 
-      selectedGame, 
-      selectedGameId: selectedGame?.id,
-      user,
-      searchQuery 
-    });
-    
     if (!selectedGame || !user) {
       alert('Пожалуйста, выберите игру');
       return;
@@ -246,8 +240,6 @@ const ProfilePage: React.FC = () => {
       notes: notes || undefined,
     };
 
-    console.log('Данные для добавления:', gameData);
-
     try {
       await dispatch(addUserGame({ userId: user.id, gameData })).unwrap();
       
@@ -260,7 +252,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleEditGame = (userGameId: number) => {
+  const handleEditGame = (userGameId: string) => {
     const gameToEdit = userGames.find(g => g.id === userGameId);
     if (!gameToEdit) return;
 
@@ -311,7 +303,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleRemoveGame = async (userGameId: number) => {
+  const handleRemoveGame = async (userGameId: string) => {
     const gameToRemove = userGames.find(g => g.id === userGameId);
     if (!gameToRemove) return;
 
@@ -603,10 +595,10 @@ const ProfilePage: React.FC = () => {
                                 handleGameSelect(game);
                               }}
                             >
-                              <img src={game.imageUrl} alt={game.title} className={styles.searchResultImage} />
+                              <img src={game.image_url} alt={game.title} className={styles.searchResultImage} />
                               <div className={styles.searchResultInfo}>
                                 <h4>{game.title}</h4>
-                                <p>{game.genres.join(', ')}</p>
+                                <p>{game.genres?.join(', ') || 'Жанры не указаны'}</p>
                               </div>
                             </div>
                           ))}
@@ -627,10 +619,10 @@ const ProfilePage: React.FC = () => {
                 {selectedGame && (
                   <>
                     <div className={styles.selectedGamePreview}>
-                      <img src={selectedGame.imageUrl} alt={selectedGame.title} />
+                      <img src={selectedGame.image_url} alt={selectedGame.title} />
                       <div>
-                        <h4>{selectedGame.title} (ID: {selectedGame.id})</h4>
-                        <p>{selectedGame.genres.join(', ')}</p>
+                        <h4>{selectedGame.title}</h4>
+                        <p>{selectedGame.genres?.join(', ') || 'Жанры не указаны'}</p>
                       </div>
                     </div>
 
@@ -757,7 +749,7 @@ const ProfilePage: React.FC = () => {
                     return (
                       <div key={userGame.id} className={styles.userGameCard}>
                         <div className={styles.userGameHeader}>
-                          <img src={game.imageUrl} alt={game.title} className={styles.userGameImage} />
+                          <img src={game.image_url} alt={game.title} className={styles.userGameImage} />
                           <div className={styles.userGameInfo}>
                             <h4>{game.title}</h4>
                             <div className={styles.userGameMeta}>

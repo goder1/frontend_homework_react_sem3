@@ -4,12 +4,14 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
   fetchGameById, 
-  selectSelectedGame,
-  selectGamesLoading,
-  updateGameFavoriteStatus 
+  selectCurrentGame, 
+  selectGamesLoading
 } from '../store/slices/gamesSlice';
-import { toggleFavoriteSync } from '../store/slices/favoritesSlice';
-import { selectIsFavorite } from '../store/slices/favoritesSlice';
+import { 
+  toggleFavorite, 
+  toggleFavoriteSync,
+  selectIsFavorite 
+} from '../store/slices/favoritesSlice';
 import styles from './GameDetailsPage.module.css';
 
 const GameDetailsPage: React.FC = () => {
@@ -17,36 +19,35 @@ const GameDetailsPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   
-  const game = useAppSelector(selectSelectedGame);
+  const game = useAppSelector(selectCurrentGame);
   const isLoading = useAppSelector(selectGamesLoading);
-  const isFavorite = useAppSelector(selectIsFavorite(Number(id)));
+  const isFavorite = useAppSelector(selectIsFavorite(id || ''));
   
   const [activeTab, setActiveTab] = useState<'min' | 'rec'>('min');
   const [activeImage, setActiveImage] = useState(0);
   
   useEffect(() => {
     if (id) {
-      dispatch(fetchGameById(Number(id)));
+      dispatch(fetchGameById(id));
     }
   }, [id, dispatch]);
 
   const handleToggleFavorite = () => {
     if (game) {
-      dispatch(updateGameFavoriteStatus({ 
-        id: game.id, 
-        isFavorite: !isFavorite 
-      }));
+      // Используем thunk для асинхронного переключения
+      dispatch(toggleFavorite({ game, isFavorite: !!isFavorite }));
       
+      // И синхронное обновление для мгновенной обратной связи
       dispatch(toggleFavoriteSync({ 
         game, 
-        isFavorite 
+        isFavorite: !!isFavorite 
       }));
     }
   };
 
   const images = [
     '../../public/images/elden.webp',
-    game?.imageUrl || '',
+    game?.image_url || '',
     '../../public/images/elden.webp',
     '../../public/images/elden.webp',
     '../../public/images/elden.webp',
@@ -210,20 +211,20 @@ const GameDetailsPage: React.FC = () => {
               <div className={styles.metaItem}>
                 <span>Платформы</span>
                 <span>
-                  {game.platforms.map(p => (
+                  {game.platforms?.map((p: string) => (
                     <span key={p} className={`${styles.platform} ${styles[p.toLowerCase()]}`}>
                       {p}
                     </span>
-                  ))}
+                  )) || 'Не указаны'}
                 </span>
               </div>
               <div className={styles.metaItem}>
                 <span>Жанры</span>
-                <span>{game.genres.join(', ')}</span>
+                <span>{game.genres?.join(', ') || 'Не указаны'}</span>
               </div>
               <div className={styles.metaItem}>
                 <span>Дата выхода</span>
-                <span>{new Date(game.releaseDate).toLocaleDateString('ru-RU')}</span>
+                <span>{game.release_date ? new Date(game.release_date).toLocaleDateString('ru-RU') : 'Не указана'}</span>
               </div>
               <div className={styles.metaItem}>
                 <span>Разработчик</span>
@@ -237,8 +238,6 @@ const GameDetailsPage: React.FC = () => {
 
             <div className={styles.priceSection}>
               <div className={styles.price}>2 999 ₽</div>
-              <div className={styles.priceOld}>3 499 ₽</div>
-              <div className={styles.discount}>-14%</div>
               <button className={styles.btnBuy}>Купить сейчас</button>
             </div>
           </div>

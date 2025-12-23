@@ -1,6 +1,6 @@
 // src/store/slices/favoritesSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Game } from '../../types/game';
+import { Game } from './gamesSlice'; // Импортируем из gamesSlice
 
 interface FavoritesState {
   favorites: Game[];
@@ -47,7 +47,7 @@ export const addToFavorites = createAsyncThunk(
 // Асинхронный thunk для удаления из избранного
 export const removeFromFavorites = createAsyncThunk(
   'favorites/remove',
-  async (gameId: number, { rejectWithValue }) => {
+  async (gameId: string, { rejectWithValue }) => { // Изменено с number на string
     try {
       // TODO: Заменить на реальный API
       // await fetch(`/api/favorites/${gameId}/remove`, { method: 'DELETE' });
@@ -112,7 +112,7 @@ const favoritesSlice = createSlice({
     },
     
     // Синхронное удаление (без API)
-    removeFavorite: (state, action: PayloadAction<number>) => {
+    removeFavorite: (state, action: PayloadAction<string>) => { // Изменено с number на string
       state.favorites = state.favorites.filter(game => game.id !== action.payload);
       saveFavoritesToStorage(state.favorites);
     },
@@ -126,10 +126,10 @@ const favoritesSlice = createSlice({
       } else {
         const existing = state.favorites.find(f => f.id === game.id);
         if (!existing) {
-          state.favorites.push({ ...game, isFavorite: true });
+          state.favorites.push(game);
         }
       }
-      saveFavoritesToStorage(state.favorites.map(f => ({ ...f, isFavorite: true })));
+      saveFavoritesToStorage(state.favorites);
     },
     
     // Очистка ошибок
@@ -154,7 +154,7 @@ const favoritesSlice = createSlice({
         state.isLoading = false;
         const existing = state.favorites.find(f => f.id === action.payload.id);
         if (!existing) {
-          state.favorites.push({ ...action.payload, isFavorite: true });
+          state.favorites.push(action.payload);
           saveFavoritesToStorage(state.favorites);
         }
       })
@@ -189,7 +189,7 @@ const favoritesSlice = createSlice({
         if (isFavorite) {
           const existing = state.favorites.find(f => f.id === game.id);
           if (!existing) {
-            state.favorites.push({ ...game, isFavorite: true });
+            state.favorites.push(game);
           }
         } else {
           state.favorites = state.favorites.filter(f => f.id !== game.id);
@@ -232,7 +232,7 @@ export const selectAllFavorites = (state: { favorites: FavoritesState }) =>
 export const selectFavoriteIds = (state: { favorites: FavoritesState }) => 
   state.favorites.favorites.map(game => game.id);
 
-export const selectIsFavorite = (gameId: number) => 
+export const selectIsFavorite = (gameId: string) => // Изменено с number на string
   (state: { favorites: FavoritesState }) => 
     state.favorites.favorites.some(game => game.id === gameId);
 

@@ -2,6 +2,8 @@
 import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '..';
 import { UserGame, ProfileStats, ProfileState, AddGameData, UpdateGameData } from '../../types/profile';
+import { supabase } from '../../lib/supabaseClient';
+import { Game } from './gamesSlice';
 
 const initialStats: ProfileStats = {
   totalGames: 0,
@@ -21,73 +23,28 @@ const initialStats: ProfileStats = {
   },
 };
 
-// Моковые данные для начала
-const initialUserGames: UserGame[] = [
-  {
-    id: 1,
-    gameId: 2,
-    userId: '1',
-    userRating: 5,
-    hoursPlayed: 156,
-    achievementsCompleted: 32,
-    totalAchievements: 42,
-    completionPercentage: 76,
-    status: 'completed',
-    lastPlayed: '2024-01-15',
-    notes: 'Эпическое приключение! Игра года безусловно.',
-    createdAt: '2023-06-10T10:00:00Z',
-    updatedAt: '2024-01-15T15:30:00Z',
-  },
-  {
-    id: 2,
-    gameId: 5,
-    userId: '1',
-    userRating: 5,
-    hoursPlayed: 243,
-    achievementsCompleted: 76,
-    totalAchievements: 78,
-    completionPercentage: 97,
-    status: 'completed',
-    lastPlayed: '2024-01-10',
-    notes: 'Лучшая RPG всех времен. Перепроходил 3 раза.',
-    createdAt: '2022-12-05T14:20:00Z',
-    updatedAt: '2024-01-10T18:45:00Z',
-  },
-  {
-    id: 3,
-    gameId: 1,
-    userId: '1',
-    userRating: 4,
-    hoursPlayed: 87,
-    achievementsCompleted: 23,
-    totalAchievements: 168,
-    completionPercentage: 14,
-    status: 'playing',
-    lastPlayed: '2024-01-05',
-    notes: 'Отличная атмосфера, но баги мешают.',
-    createdAt: '2023-11-20T09:15:00Z',
-    updatedAt: '2024-01-05T20:10:00Z',
-  },
-];
-
 const initialState: ProfileState = {
-  userGames: initialUserGames,
-  stats: calculateStats(initialUserGames),
+  userGames: [],
+  stats: initialStats,
   isLoading: false,
   error: null,
 };
 
 // Вспомогательная функция для расчета статистики
-function calculateStats(userGames: UserGame[]): ProfileStats {
+function calculateStats(userGames: UserGame[], allGames: Game[] = []): ProfileStats {
   if (userGames.length === 0) return initialStats;
+
+  // Создаем карту игр для быстрого доступа
+  const gamesMap = new Map<string, Game>();
+  allGames.forEach(game => gamesMap.set(game.id, game));
 
   const stats: ProfileStats = {
     totalGames: userGames.length,
     totalHours: userGames.reduce((sum, game) => sum + game.hoursPlayed, 0),
     averageRating: userGames.reduce((sum, game) => sum + game.userRating, 0) / userGames.length,
     completionRate: userGames.reduce((sum, game) => sum + game.completionPercentage, 0) / userGames.length,
-    favoriteGenre: 'RPG', // TODO: Рассчитать по жанрам из gamesSlice
-    favoritePlatform: 'PC', // TODO: Рассчитать по платформам
+    favoriteGenre: 'Не указан',
+    favoritePlatform: 'Не указана',
     achievementsTotal: userGames.reduce((sum, game) => sum + game.totalAchievements, 0),
     achievementsCompleted: userGames.reduce((sum, game) => sum + game.achievementsCompleted, 0),
     gamesByStatus: {
@@ -99,23 +56,89 @@ function calculateStats(userGames: UserGame[]): ProfileStats {
     },
   };
 
+  // Рассчитываем любимый жанр и платформу
+  const genreCount: Record<string, number> = {};
+  const platformCount: Record<string, number> = {};
+
+  userGames.forEach(userGame => {
+    const game = gamesMap.get(userGame.gameId);
+    if (game) {
+      // Жанры
+      if (game.genres) {
+        game.genres.forEach(genre => {
+          genreCount[genre] = (genreCount[genre] || 0) + 1;
+        });
+      }
+
+      // Платформы
+      if (game.platforms) {
+        game.platforms.forEach(platform => {
+          platformCount[platform] = (platformCount[platform] || 0) + 1;
+        });
+      }
+    }
+  });
+
+  // Находим самый популярный жанр
+  let maxGenreCount = 0;
+  let favoriteGenre = 'Не указан';
+  Object.entries(genreCount).forEach(([genre, count]) => {
+    if (count > maxGenreCount) {
+      maxGenreCount = count;
+      favoriteGenre = genre;
+    }
+  });
+
+  // Находим самую популярную платформу
+  let maxPlatformCount = 0;
+  let favoritePlatform = 'Не указана';
+  Object.entries(platformCount).forEach(([platform, count]) => {
+    if (count > maxPlatformCount) {
+      maxPlatformCount = count;
+      favoritePlatform = platform;
+    }
+  });
+
+  stats.favoriteGenre = favoriteGenre;
+  stats.favoritePlatform = favoritePlatform;
+
   return stats;
 }
 
 // Асинхронный thunk для загрузки игр пользователя
 export const fetchUserGames = createAsyncThunk(
   'profile/fetchUserGames',
-  async (userId: string, { rejectWithValue }) => {
+  async (userId: string, { rejectWithValue, getState }) => {
     try {
-      // TODO: Заменить на реальный API
-      // const response = await fetch(`/api/users/${userId}/games`);
-      // const data = await response.json();
-      
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      // Возвращаем моковые данные
-      return initialUserGames.filter(game => game.userId === userId);
+      // Получаем игры пользователя из Supabase
+      const { data: userGames, error } = await supabase
+        .from('user_games')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Преобразуем данные из формата Supabase в наш формат
+      const formattedUserGames: UserGame[] = userGames.map(game => ({
+        id: game.id,
+        gameId: game.game_id,
+        userId: game.user_id,
+        userRating: game.user_rating || 0,
+        hoursPlayed: game.hours_played || 0,
+        achievementsCompleted: game.achievements_completed || 0,
+        totalAchievements: 0, // В вашей таблице нет этого поля, нужно добавить или рассчитать
+        completionPercentage: 0, // В вашей таблице нет этого поля
+        status: game.status || 'playing',
+        lastPlayed: game.last_played ? new Date(game.last_played).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        notes: game.notes || '',
+        createdAt: game.created_at || new Date().toISOString(),
+        updatedAt: game.updated_at || new Date().toISOString(),
+      }));
+
+      return formattedUserGames;
     } catch (error: any) {
+      console.error('Ошибка при загрузке игр пользователя:', error);
       return rejectWithValue(error.message || 'Ошибка при загрузке игр пользователя');
     }
   }
@@ -124,36 +147,55 @@ export const fetchUserGames = createAsyncThunk(
 // Асинхронный thunk для добавления игры
 export const addUserGame = createAsyncThunk(
   'profile/addGame',
-  async ({ userId, gameData }: { userId: string; gameData: AddGameData }, { rejectWithValue }) => {
+  async ({ userId, gameData }: { userId: string; gameData: AddGameData }, { rejectWithValue, getState }) => {
     try {
-      // TODO: Заменить на реальный API
-      // const response = await fetch(`/api/users/${userId}/games`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(gameData),
-      // });
-      // const data = await response.json();
-      
-      await new Promise(resolve => setTimeout(resolve, 400));
-      
+      const state = getState() as RootState;
+      const allGames = selectAllGames(state);
+      // Ищем игру по ID (теперь gameId должен быть string/UUID)
+      const game = allGames.find(g => g.id === gameData.gameId.toString());
+
+      if (!game) {
+        throw new Error('Игра не найдена');
+      }
+
+      // Вставляем данные в Supabase
+      const { data, error } = await supabase
+        .from('user_games')
+        .insert({
+          user_id: userId,
+          game_id: gameData.gameId.toString(),
+          user_rating: gameData.userRating || 0,
+          hours_played: gameData.hoursPlayed || 0,
+          achievements_completed: gameData.achievementsCompleted || 0,
+          status: gameData.status || 'playing',
+          last_played: new Date().toISOString(),
+          notes: gameData.notes || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Преобразуем обратно в наш формат
       const newGame: UserGame = {
-        id: Date.now(),
-        gameId: gameData.gameId,
-        userId,
-        userRating: gameData.userRating || 0,
-        hoursPlayed: gameData.hoursPlayed || 0,
-        achievementsCompleted: gameData.achievementsCompleted || 0,
-        totalAchievements: 0, // TODO: Получить из gamesSlice
-        completionPercentage: 0,
-        status: gameData.status || 'playing',
-        notes: gameData.notes,
-        lastPlayed: new Date().toISOString().split('T')[0],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        id: data.id,
+        gameId: data.game_id,
+        userId: data.user_id,
+        userRating: data.user_rating,
+        hoursPlayed: data.hours_played,
+        achievementsCompleted: data.achievements_completed,
+        totalAchievements: 0, // Нужно получить из таблицы игр или добавить поле
+        completionPercentage: 0, // Можно рассчитать
+        status: data.status,
+        lastPlayed: data.last_played ? new Date(data.last_played).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        notes: data.notes || '',
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
       };
-      
+
       return newGame;
     } catch (error: any) {
+      console.error('Ошибка при добавлении игры:', error);
       return rejectWithValue(error.message || 'Ошибка при добавлении игры');
     }
   }
@@ -162,20 +204,42 @@ export const addUserGame = createAsyncThunk(
 // Асинхронный thunk для обновления игры
 export const updateUserGame = createAsyncThunk(
   'profile/updateGame',
-  async ({ gameId, updateData }: { gameId: number; updateData: UpdateGameData }, { rejectWithValue }) => {
+  async ({ gameId, updateData }: { gameId: string; updateData: UpdateGameData }, { rejectWithValue, getState }) => {
     try {
-      // TODO: Заменить на реальный API
-      // const response = await fetch(`/api/user-games/${gameId}`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(updateData),
-      // });
-      // const data = await response.json();
+      const state = getState() as RootState;
+      const userGame = selectUserGameById(gameId)(state);
       
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      return { gameId, updateData };
+      if (!userGame) {
+        throw new Error('Игра не найдена');
+      }
+
+      // Обновляем данные в Supabase
+      const { data, error } = await supabase
+        .from('user_games')
+        .update({
+          user_rating: updateData.userRating ?? userGame.userRating,
+          hours_played: updateData.hoursPlayed ?? userGame.hoursPlayed,
+          achievements_completed: updateData.achievementsCompleted ?? userGame.achievementsCompleted,
+          status: updateData.status ?? userGame.status,
+          last_played: updateData.lastPlayed ? new Date(updateData.lastPlayed).toISOString() : userGame.lastPlayed,
+          notes: updateData.notes ?? userGame.notes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', gameId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return { 
+        gameId, 
+        updateData: {
+          ...updateData,
+          updatedAt: data.updated_at,
+        } 
+      };
     } catch (error: any) {
+      console.error('Ошибка при обновлении игры:', error);
       return rejectWithValue(error.message || 'Ошибка при обновлении игры');
     }
   }
@@ -184,15 +248,18 @@ export const updateUserGame = createAsyncThunk(
 // Асинхронный thunk для удаления игры
 export const removeUserGame = createAsyncThunk(
   'profile/removeGame',
-  async (gameId: number, { rejectWithValue }) => {
+  async (gameId: string, { rejectWithValue }) => {
     try {
-      // TODO: Заменить на реальный API
-      // await fetch(`/api/user-games/${gameId}`, { method: 'DELETE' });
-      
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      const { error } = await supabase
+        .from('user_games')
+        .delete()
+        .eq('id', gameId);
+
+      if (error) throw error;
+
       return gameId;
     } catch (error: any) {
+      console.error('Ошибка при удалении игры:', error);
       return rejectWithValue(error.message || 'Ошибка при удалении игры');
     }
   }
@@ -202,7 +269,7 @@ const profileSlice = createSlice({
   name: 'profile',
   initialState,
   reducers: {
-    // Синхронное добавление игры (без API)
+    // Синхронное добавление игры (без API) - для офлайн использования
     addGame: (state, action: PayloadAction<UserGame>) => {
       // Проверяем, нет ли уже такой игры
       const existing = state.userGames.find(
@@ -211,12 +278,15 @@ const profileSlice = createSlice({
       
       if (!existing) {
         state.userGames.unshift(action.payload);
-        state.stats = calculateStats(state.userGames);
+        // Для расчета статистики нужны все игры, получаем их из состояния
+        const stateRoot = state as unknown as RootState;
+        const allGames = selectAllGames(stateRoot);
+        state.stats = calculateStats(state.userGames, allGames);
       }
     },
     
     // Синхронное обновление игры
-    updateGame: (state, action: PayloadAction<{ gameId: number; updateData: UpdateGameData }>) => {
+    updateGame: (state, action: PayloadAction<{ gameId: string; updateData: UpdateGameData }>) => {
       const { gameId, updateData } = action.payload;
       const index = state.userGames.findIndex(game => game.id === gameId);
       
@@ -226,14 +296,18 @@ const profileSlice = createSlice({
           ...updateData,
           updatedAt: new Date().toISOString(),
         };
-        state.stats = calculateStats(state.userGames);
+        const stateRoot = state as unknown as RootState;
+        const allGames = selectAllGames(stateRoot);
+        state.stats = calculateStats(state.userGames, allGames);
       }
     },
     
     // Синхронное удаление игры
-    removeGame: (state, action: PayloadAction<number>) => {
+    removeGame: (state, action: PayloadAction<string>) => {
       state.userGames = state.userGames.filter(game => game.id !== action.payload);
-      state.stats = calculateStats(state.userGames);
+      const stateRoot = state as unknown as RootState;
+      const allGames = selectAllGames(stateRoot);
+      state.stats = calculateStats(state.userGames, allGames);
     },
     
     // Обновление статистики
@@ -263,7 +337,10 @@ const profileSlice = createSlice({
       .addCase(fetchUserGames.fulfilled, (state, action) => {
         state.isLoading = false;
         state.userGames = action.payload;
-        state.stats = calculateStats(action.payload);
+        // Для расчета статистики нужны все игры, получаем их из состояния
+        const stateRoot = state as unknown as RootState;
+        const allGames = selectAllGames(stateRoot);
+        state.stats = calculateStats(action.payload, allGames);
       })
       .addCase(fetchUserGames.rejected, (state, action) => {
         state.isLoading = false;
@@ -283,7 +360,9 @@ const profileSlice = createSlice({
         );
         if (!existing) {
           state.userGames.unshift(action.payload);
-          state.stats = calculateStats(state.userGames);
+          const stateRoot = state as unknown as RootState;
+          const allGames = selectAllGames(stateRoot);
+          state.stats = calculateStats(state.userGames, allGames);
         }
       })
       .addCase(addUserGame.rejected, (state, action) => {
@@ -304,9 +383,10 @@ const profileSlice = createSlice({
           state.userGames[index] = {
             ...state.userGames[index],
             ...updateData,
-            updatedAt: new Date().toISOString(),
           };
-          state.stats = calculateStats(state.userGames);
+          const stateRoot = state as unknown as RootState;
+          const allGames = selectAllGames(stateRoot);
+          state.stats = calculateStats(state.userGames, allGames);
         }
       })
       .addCase(updateUserGame.rejected, (state, action) => {
@@ -321,7 +401,9 @@ const profileSlice = createSlice({
       .addCase(removeUserGame.fulfilled, (state, action) => {
         state.isLoading = false;
         state.userGames = state.userGames.filter(game => game.id !== action.payload);
-        state.stats = calculateStats(state.userGames);
+        const stateRoot = state as unknown as RootState;
+        const allGames = selectAllGames(stateRoot);
+        state.stats = calculateStats(state.userGames, allGames);
       })
       .addCase(removeUserGame.rejected, (state, action) => {
         state.isLoading = false;
@@ -347,12 +429,15 @@ export const selectProfileStats = (state: RootState) => state.profile.stats;
 export const selectProfileLoading = (state: RootState) => state.profile.isLoading;
 export const selectProfileError = (state: RootState) => state.profile.error;
 
+// Импортируем селектор всех игр из gamesSlice
+export const selectAllGames = (state: RootState) => state.games.games;
+
 // Селектор для игры пользователя по ID игры
-export const selectUserGameByGameId = (gameId: number) => 
+export const selectUserGameByGameId = (gameId: string) => 
   (state: RootState) => state.profile.userGames.find(game => game.gameId === gameId);
 
 // Селектор для игры пользователя по ID записи
-export const selectUserGameById = (userGameId: number) => 
+export const selectUserGameById = (userGameId: string) => 
   (state: RootState) => state.profile.userGames.find(game => game.id === userGameId);
 
 // Селектор для игр по статусу
@@ -384,3 +469,17 @@ export const selectRecentUserGames = (limit: number = 5) =>
         .sort((a, b) => new Date(b.lastPlayed).getTime() - new Date(a.lastPlayed).getTime())
         .slice(0, limit)
   );
+
+// Селектор для поиска игр пользователя с деталями игры
+export const selectUserGamesWithDetails = createSelector(
+  [selectUserGames, selectAllGames],
+  (userGames, allGames) => {
+    const gamesMap = new Map<string, Game>();
+    allGames.forEach(game => gamesMap.set(game.id, game));
+
+    return userGames.map(userGame => ({
+      ...userGame,
+      game: gamesMap.get(userGame.gameId)
+    })).filter(item => item.game); // Фильтруем только те, у которых есть детали игры
+  }
+);
