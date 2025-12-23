@@ -105,10 +105,12 @@ function calculateStats(userGames: UserGame[], allGames: Game[] = []): ProfileSt
   return stats;
 }
 
+export type { AddGameData, UpdateGameData } from '../../types/profile';
+
 // Асинхронный thunk для загрузки игр пользователя
 export const fetchUserGames = createAsyncThunk(
   'profile/fetchUserGames',
-  async (userId: string, { rejectWithValue, getState }) => {
+  async (userId: string, { rejectWithValue }) => {
     try {
       // Получаем игры пользователя из Supabase
       const { data: userGames, error } = await supabase
@@ -120,7 +122,7 @@ export const fetchUserGames = createAsyncThunk(
       if (error) throw error;
 
       // Преобразуем данные из формата Supabase в наш формат
-      const formattedUserGames: UserGame[] = userGames.map(game => ({
+      const formattedUserGames: UserGame[] = userGames.map((game: any) => ({
         id: game.id,
         gameId: game.game_id,
         userId: game.user_id,

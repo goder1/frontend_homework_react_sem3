@@ -1,4 +1,5 @@
 // src/services/gameService.ts
+// @ts-ignore
 import { supabase } from '../lib/supabaseClient';
 
 export interface GameFilters {
@@ -18,8 +19,6 @@ class GameService {
       page = 1,
       limit = 12,
       search = '',
-      platforms = [],
-      genres = [],
       sortBy = 'rating',
       sortOrder = 'desc'
     } = filters;
@@ -172,7 +171,7 @@ class GameService {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (favorites || []).map(item => item.games);
+    return (favorites || []).map((item: any) => item.games);
   }
 }
 

@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import RegisterForm from '../components/Auth/RegisterForm';
-import LoginForm from '../components/Auth/LoginForm';
-import AuthService from '../services/authService';
+import RegisterForm from '../components/auth/RegisterForm';
+import LoginForm from '../components/auth/LoginForm';
 import './AuthPage.module.css';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
 
-  const handleAuthSuccess = (user) => {
+  const handleAuthSuccess = (user: any) => {
     console.log('Аутентификация успешна:', user);
     navigate('/'); // Перенаправляем на главную
   };
@@ -19,7 +18,6 @@ const AuthPage = () => {
       <div className="auth-container">
         {isLogin ? (
           <LoginForm 
-            onSuccess={handleAuthSuccess}
             switchToRegister={() => setIsLogin(false)}
           />
         ) : (

@@ -1,6 +1,6 @@
 // src/pages/GameDetailsPage.tsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { 
   fetchGameById, 
@@ -16,7 +16,6 @@ import styles from './GameDetailsPage.module.css';
 
 const GameDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   
   const game = useAppSelector(selectCurrentGame);

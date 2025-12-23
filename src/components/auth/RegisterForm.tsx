@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import AuthService from '../../services/authService';
 import { useAppDispatch } from '../../store/hooks';
-import { registerUser } from '../../store/slices/authSlice';
 import './AuthForms.css';
 
-const RegisterForm = ({ onSuccess, switchToLogin }) => {
-  const dispatch = useAppDispatch();
+interface RegisterFormProps {
+  onSuccess?: (user: any) => void;
+  switchToLogin: () => void;
+}
+
+const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess, switchToLogin }) => {
+  useAppDispatch();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -15,14 +19,14 @@ const RegisterForm = ({ onSuccess, switchToLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     
@@ -74,7 +78,7 @@ const RegisterForm = ({ onSuccess, switchToLogin }) => {
             value={formData.username}
             onChange={handleChange}
             required
-            minLength="3"
+            minLength={3}
             placeholder="Введите имя пользователя"
           />
         </div>
@@ -101,7 +105,7 @@ const RegisterForm = ({ onSuccess, switchToLogin }) => {
             value={formData.password}
             onChange={handleChange}
             required
-            minLength="6"
+            minLength={6}
             placeholder="Не менее 6 символов"
           />
         </div>

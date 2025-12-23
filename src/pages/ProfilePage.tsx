@@ -19,8 +19,6 @@ import {
   addUserGame,
   updateUserGame,
   removeUserGame,
-  clearError,
-  resetProfile,
   // Типы
   AddGameData,
   UpdateGameData
@@ -28,7 +26,7 @@ import {
 import { UserGame } from '../types/profile';
 import { Game } from '../types/game';
 import styles from './ProfilePage.module.css';
-import { RootState } from '../store/store';
+import { RootState } from '../store/index';
 
 // Моковый профиль для заглушки (будет заменен данными из authSlice)
 const mockProfile = {
@@ -91,7 +89,7 @@ const ProfilePage: React.FC = () => {
   // Создаем мемоизированный объект для быстрого поиска игр
   const gamesMap = useMemo(() => {
     const map = new Map<string, Game>();
-    allGames.forEach(game => map.set(game.id, game));
+    allGames.forEach((game: Game) => map.set(game.id, game));
     return map;
   }, [allGames]);
 
@@ -128,9 +126,9 @@ const ProfilePage: React.FC = () => {
   const filteredGames = useMemo(() => {
     if (!searchQuery || editingGameId) return [];
     
-    return allGames.filter(game => {
+    return allGames.filter((game: Game) => {
       const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           (game.genres && game.genres.some(genre => genre.toLowerCase().includes(searchQuery.toLowerCase())));
+                           (game.genres && game.genres.some((genre: string) => genre.toLowerCase().includes(searchQuery.toLowerCase())));
       const notInCollection = !userGames.some(userGame => userGame.gameId === game.id);
       return matchesSearch && notInCollection;
     });
@@ -587,7 +585,7 @@ const ProfilePage: React.FC = () => {
                       
                       {showSearchResults && filteredGames.length > 0 && (
                         <div className={styles.searchResults}>
-                          {filteredGames.slice(0, 5).map((game) => (
+                          {filteredGames.slice(0, 5).map((game: Game) => (
                             <div
                               key={game.id}
                               className={`${styles.searchResultItem} ${selectedGame?.id === game.id ? styles.selected : ''}`}

@@ -177,7 +177,7 @@ export const fetchGames = createAsyncThunk(
           sortOrder = 'desc';
           break;
         case 'newest':
-        case 'release':
+        case 'release_date':
           sortBy = 'release_date';
           sortOrder = 'desc';
           break;

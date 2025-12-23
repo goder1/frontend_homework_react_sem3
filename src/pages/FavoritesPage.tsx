@@ -9,7 +9,6 @@ import {
   selectAverageRating,
   loadFavorites
 } from '../store/slices/favoritesSlice';
-import { updateFilters } from '../store/slices/gamesSlice';
 import GameFilters from '../components/games/GameFilters';
 import GameCard from '../components/games/GameCard';
 import styles from './FavoritesPage.module.css';

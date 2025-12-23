@@ -1,13 +1,9 @@
 // src/components/layout/Header.tsx
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { useAppSelector } from '../../store/hooks';
-import { selectCurrentUser } from '../../store/slices/authSlice';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {
-  const user = useAppSelector(selectCurrentUser);
-
   return (
     <header className={styles.header}>
       <div className="container">

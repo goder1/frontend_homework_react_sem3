@@ -169,7 +169,7 @@ const HomePage: React.FC = () => {
         <div className="container">
           <section className={styles.featuredGames}>
             <h2>
-              {filters.sortBy === 'newest' || filters.sortBy === 'release' 
+              {filters.sortBy === 'newest' || filters.sortBy === 'release_date' 
                 ? 'Новые релизы' 
                 : 'Популярные игры'
               }

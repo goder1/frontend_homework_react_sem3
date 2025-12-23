@@ -6,9 +6,7 @@ import styles from './GamesList.module.css';
 
 interface GamesListProps {
   games: Game[];
-  filters: FilterState;
   onFilterChange: (filters: FilterState) => void;
-  onToggleFavorite?: (id: number) => void;
   title?: string;
   emptyMessage?: string;
   showFilters?: boolean;
@@ -17,20 +15,12 @@ interface GamesListProps {
 
 const GamesList: React.FC<GamesListProps> = ({
   games,
-  filters,
   onFilterChange,
-  onToggleFavorite,
   title = 'Игры',
   emptyMessage = 'Игры не найдены',
   showFilters = true,
   showTitle = true,
 }) => {
-  const handleDefaultToggleFavorite = (id: number) => {
-    console.log(`Toggle favorite for game ${id}`);
-  };
-
-  const handleToggleFavorite = onToggleFavorite || handleDefaultToggleFavorite;
-
   return (
     <div className={styles.gamesList}>
       {showFilters && (
@@ -59,7 +49,6 @@ const GamesList: React.FC<GamesListProps> = ({
               <GameCard
                 key={game.id}
                 game={game}
-                onToggleFavorite={handleToggleFavorite}
               />
             ))}
           </div>

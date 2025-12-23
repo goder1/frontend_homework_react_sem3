@@ -8,7 +8,7 @@ import styles from './GameCard.module.css';
 
 interface GameCardProps {
   game: Game;
-  onViewDetails?: (id: number) => void; // Сделаем опциональным
+  onViewDetails?: (id: string) => void; // Сделаем опциональным
 }
 
 const GameCard: React.FC<GameCardProps> = ({
@@ -56,7 +56,7 @@ const GameCard: React.FC<GameCardProps> = ({
         <h3>{game.title}</h3>
         
         <div className={styles.gameMeta}>
-          {game.platforms.map((platform) => (
+          {game.platforms?.map((platform) => (
             <span 
               key={platform} 
               className={`${styles.platform} ${styles[platform.toLowerCase()]}`}
@@ -67,7 +67,7 @@ const GameCard: React.FC<GameCardProps> = ({
         </div>
         
         <div className={styles.gameGenres}>
-          {game.genres.map((genre) => (
+          {game.genres?.map((genre) => (
             <span key={genre} className={styles.genre}>
               {genre}
             </span>

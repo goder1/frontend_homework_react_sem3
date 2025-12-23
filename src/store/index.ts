@@ -43,7 +43,7 @@ export const store = configureStore({
         ],
         ignoredPaths: ['auth.user'],
       },
-    }).concat((store) => (next) => (action) => {
+    }).concat((store: any) => (next: any) => (action: any) => {
       const result = next(action);
       
       // Сохраняем только auth состояние

@@ -9,12 +9,12 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 // Хуки для конкретных селекторов (опционально, для удобства)
 export const useGames = () => {
   const games = useSelector((state: RootState) => state.games.games);
-  const filteredGames = useSelector((state: RootState) => state.games.filteredGames);
+  //const filteredGames = useSelector((state: RootState) => state.games.filteredGames);
   const filters = useSelector((state: RootState) => state.games.filters);
-  const isLoading = useSelector((state: RootState) => state.games.isLoading);
+  const isLoading = useSelector((state: RootState) => state.games.loading);
   
-  return { games, filteredGames, filters, isLoading };
+  return { games, filters, isLoading };
 };
 
 export const useSelectedGame = () => 
-  useSelector((state: RootState) => state.games.selectedGame);
+  useSelector((state: RootState) => state.games.currentGame);

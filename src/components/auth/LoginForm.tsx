@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/hooks';
 import { loginUser } from '../../store/slices/authSlice';
 import './AuthForms.css';
 
-const LoginForm = ({ switchToRegister }) => {
+interface LoginFormProps {
+  switchToRegister: () => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ switchToRegister }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,20 +18,20 @@ const LoginForm = ({ switchToRegister }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const result = await dispatch(loginUser({
+      dispatch(loginUser({
         email: formData.email,
         password: formData.password
       })).unwrap();

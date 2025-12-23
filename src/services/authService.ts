@@ -1,4 +1,5 @@
 // src/services/authService.ts
+// @ts-ignore
 import { supabase } from '../lib/supabaseClient';
 
 class AuthService {
