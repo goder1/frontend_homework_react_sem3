@@ -9,7 +9,9 @@ import {
   fetchGames,
   updateFilters,
   fetchFeaturedGames,
-  fetchNewReleases
+  fetchNewReleases,
+  testDirectQuery,
+  debugDatabaseContent
 } from '../store/slices/gamesSlice';
 import GameFilters from '../components/games/GameFilters';
 import GameCard from '../components/games/GameCard';
@@ -28,9 +30,17 @@ const HomePage: React.FC = () => {
   const newReleases = useAppSelector(selectNewReleases);
   const isLoading = useAppSelector(selectGamesLoading);
   
+  //testDirectQuery();
+  //debugDatabaseContent();
+  
   console.log('HomePage render - popularGames:', popularGames);
   console.log('HomePage render - newReleases:', newReleases);
   console.log('HomePage render - isLoading:', isLoading);
+  
+  console.log('HomePage - First popular game:', popularGames[0]);
+  console.log('HomePage - First popular game platforms:', popularGames[0]?.platforms);
+  console.log('HomePage - First popular game genres:', popularGames[0]?.genres);
+  console.log('HomePage - First popular game image_url:', popularGames[0]?.image_url);
 
   // Обработчик фильтров
   const handleFilterChange = (filters: any) => {

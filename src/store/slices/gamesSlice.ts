@@ -25,13 +25,13 @@ export interface GameWithRelations {
   price: number;
   release_date: string;
   achievements?: number;
-  platforms?: Array<{
+  game_platforms?: Array<{  // Изменено с platforms на game_platforms
     platforms: {
       id: string;
       name: string;
     }
   }>;
-  genres?: Array<{
+  game_genres?: Array<{  // Изменено с genres на game_genres
     genres: {
       id: string;
       name: string;
@@ -84,7 +84,22 @@ const initialState: GamesState = {
 };
 
 // Вспомогательная функция для преобразования игры с отношениями в простую игру
-const transformGame = (gameWithRelations: GameWithRelations): Game => {
+const transformGame = (gameWithRelations: any): Game => {
+  console.log('Transforming game:', gameWithRelations?.title);
+  
+  // Извлекаем платформы из новой структуры
+  const platforms = gameWithRelations.game_platforms?.map((gp: any) => 
+    gp.platforms?.name
+  ).filter(Boolean) || [];
+
+  // Извлекаем жанры из новой структуры
+  const genres = gameWithRelations.game_genres?.map((gg: any) => 
+    gg.genres?.name
+  ).filter(Boolean) || [];
+
+  console.log(`  Platforms: ${platforms.join(', ')}`);
+  console.log(`  Genres: ${genres.join(', ')}`);
+
   return {
     id: gameWithRelations.id,
     title: gameWithRelations.title,
@@ -94,8 +109,8 @@ const transformGame = (gameWithRelations: GameWithRelations): Game => {
     price: gameWithRelations.price,
     release_date: gameWithRelations.release_date,
     achievements: gameWithRelations.achievements,
-    platforms: gameWithRelations.platforms?.map(p => p.platforms.name),
-    genres: gameWithRelations.genres?.map(g => g.genres.name)
+    platforms: platforms,
+    genres: genres
   };
 };
 
@@ -113,8 +128,16 @@ export const fetchGames = createAsyncThunk(
         .from('games')
         .select(`
           *,
-          platforms:game_platforms(platforms(*)),
-          genres:game_genres(genres(*))
+          game_platforms (
+            platforms (
+              name
+            )
+          ),
+          game_genres (
+            genres (
+              name
+            )
+          )
         `, { count: 'exact' });
 
       // Поиск
@@ -150,6 +173,7 @@ export const fetchGames = createAsyncThunk(
 
       if (error) throw error;
 
+      console.log('Filtered games raw:', games);
       // Преобразуем данные
       const transformedGames = games?.map(transformGame) || [];
 
@@ -173,13 +197,23 @@ export const fetchGameById = createAsyncThunk(
         .from('games')
         .select(`
           *,
-          platforms:game_platforms(platforms(*)),
-          genres:game_genres(genres(*))
+          game_platforms (
+            platforms (
+              name
+            )
+          ),
+          game_genres (
+            genres (
+              name
+            )
+          )
         `)
         .eq('id', id)
         .single();
 
       if (error) throw error;
+      
+      console.log('Game by ID raw:', game);
       return transformGame(game);
 
     } catch (error: any) {
@@ -188,18 +222,118 @@ export const fetchGameById = createAsyncThunk(
   }
 );
 
+export const testDirectQuery = async () => {
+  const testGameId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'; // Cyberpunk 2077
+  
+  // Проверяем напрямую через game_platforms
+  const { data, error } = await supabase
+    .from('game_platforms')
+    .select('*')
+  
+  console.log('Direct query result:', data);
+  console.log('Direct query error:', error);
+  
+  return data;
+};
+
+export const debugDatabaseContent = async () => {
+  console.log('=== DATABASE DIAGNOSTICS ===');
+  
+  try {
+    // 1. Проверим таблицу games
+    const { data: allGames, count: gamesCount } = await supabase
+      .from('games')
+      .select('id, title', { count: 'exact' })
+      .limit(5);
+    
+    console.log(`Games table has ${gamesCount} entries`);
+    console.log('First 5 games:', allGames);
+    
+    // 2. Проверим таблицу platforms
+    const { data: allPlatforms } = await supabase
+      .from('platforms')
+      .select('*');
+    
+    console.log(`Platforms:`, allPlatforms);
+    
+    // 3. Проверим таблицу game_platforms ВСЕ записи
+    const { data: allGamePlatforms, count: gpCount } = await supabase
+      .from('game_platforms')
+      .select('game_id, platform_id', { count: 'exact' });
+    
+    console.log(`game_platforms has ${gpCount} entries`);
+    console.log('All game_platforms entries:', allGamePlatforms);
+    
+    // 4. Проверим конкретную игру с разными форматами ID
+    const cyberpunkId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
+    
+    // Вариант 1: Проверка в таблице games
+    const { data: cyberpunkGame } = await supabase
+      .from('games')
+      .select('*')
+      .eq('id', cyberpunkId)
+      .single();
+    
+    console.log('\nCyberpunk game from games table:', cyberpunkGame);
+    
+    // Вариант 2: Проверка в game_platforms с разными форматами
+    console.log('\nChecking game_platforms with different ID formats:');
+    
+    // С дефисами
+    const { data: gp1 } = await supabase
+      .from('game_platforms')
+      .select('*')
+      .eq('game_id', cyberpunkId);
+    console.log('With hyphens:', gp1);
+    
+    // Без дефисов
+    const idNoHyphens = cyberpunkId.replace(/-/g, '');
+    const { data: gp2 } = await supabase
+      .from('game_platforms')
+      .select('*')
+      .eq('game_id', idNoHyphens);
+    console.log('Without hyphens:', gp2);
+    
+    // В верхнем регистре
+    const { data: gp3 } = await supabase
+      .from('game_platforms')
+      .select('*')
+      .eq('game_id', cyberpunkId.toUpperCase());
+    console.log('Uppercase:', gp3);
+    
+    // 5. Проверим RLS политики
+    console.log('\n=== RLS CHECK ===');
+    const { data: rlsInfo } = await supabase
+      .rpc('get_rls_policies'); // Нужно создать эту функцию
+    
+    console.log('RLS info:', rlsInfo);
+    
+  } catch (error) {
+    console.error('Diagnostic error:', error);
+  }
+};
+
 // Получение популярных игр (фичеред)
 export const fetchFeaturedGames = createAsyncThunk(
   'games/fetchFeaturedGames',
   async (limit: number = 6, { rejectWithValue }) => {
     try {
       console.log('Fetching featured games...');
+      
       const { data: games, error } = await supabase
         .from('games')
         .select(`
           *,
-          platforms:game_platforms(platforms(*)),
-          genres:game_genres(genres(*))
+          game_platforms (
+            platforms (
+              name
+            )
+          ),
+          game_genres (
+            genres (
+              name
+            )
+          )
         `)
         .order('rating', { ascending: false })
         .limit(limit);
@@ -208,6 +342,7 @@ export const fetchFeaturedGames = createAsyncThunk(
         console.error('Error fetching featured games:', error);
         throw error;
       }
+      
       console.log('Raw featured games from Supabase:', games);
       const transformedGames = games?.map(transformGame) || [];
       console.log('Transformed featured games:', transformedGames);
@@ -230,8 +365,16 @@ export const fetchNewReleases = createAsyncThunk(
         .from('games')
         .select(`
           *,
-          platforms:game_platforms(platforms(*)),
-          genres:game_genres(genres(*))
+          game_platforms (
+            platforms (
+              name
+            )
+          ),
+          game_genres (
+            genres (
+              name
+            )
+          )
         `)
         .order('release_date', { ascending: false })
         .limit(limit);
@@ -261,12 +404,21 @@ export const fetchAllGames = createAsyncThunk(
         .from('games')
         .select(`
           *,
-          platforms:game_platforms(platforms(*)),
-          genres:game_genres(genres(*))
+          game_platforms (
+            platforms (
+              name
+            )
+          ),
+          game_genres (
+            genres (
+              name
+            )
+          )
         `)
         .order('title', { ascending: true });
 
       if (error) throw error;
+      console.log('All games raw:', games);
       const transformedGames = games?.map(transformGame) || [];
       return transformedGames;
 

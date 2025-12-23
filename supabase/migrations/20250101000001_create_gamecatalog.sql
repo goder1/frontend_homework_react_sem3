@@ -110,18 +110,18 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Вставляем игры
 INSERT INTO games (id, title, description, image_url, rating, price, release_date) VALUES
-  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Cyberpunk 2077', 'Приключение в открытом мире в ночном городе будущего', '/images/cyberpunk.jpg', 4.5, 2999.00, '2020-12-10'),
-  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'The Witcher 3: Wild Hunt', 'Эпическое RPG приключение в мире ведьмака', '/images/witcher3.jpg', 4.9, 1999.00, '2015-05-19'),
-  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Elden Ring', 'Фэнтезийное действие с открытым миром от создателей Dark Souls', '/images/elden-ring.jpg', 4.8, 3499.00, '2022-02-25'),
-  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'God of War Ragnarök', 'Продолжение эпического приключения Кратоса и Атрея', '/images/god-of-war.jpg', 4.9, 3999.00, '2022-11-09'),
-  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Stray', 'Кошка исследует киберпанк-город', '/images/stray.jpg', 4.3, 1499.00, '2022-07-19'),
-  ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'Hollow Knight', 'Исследование подземного королевства насекомых', '/images/hollow-knight.jpg', 4.7, 599.00, '2017-02-24'),
-  ('11111111-1111-1111-1111-111111111112', 'Baldur''s Gate 3', 'Эпическая RPG с глубоким сюжетом и тактическими боями', '/images/baldurs-gate-3.jpg', 4.9, 3499.00, '2023-08-03'),
-  ('22222222-2222-2222-2222-222222222223', 'Red Dead Redemption 2', 'История бандита в диком западе', '/images/rdr2.jpg', 4.8, 2499.00, '2018-10-26'),
-  ('33333333-3333-3333-3333-333333333334', 'The Legend of Zelda: Breath of the Wild', 'Приключение в открытом мире Хайрула', '/images/zelda-botw.jpg', 4.9, 3999.00, '20173-03-03'),
-  ('44444444-4444-4444-4444-444444444445', 'Portal 2', 'Головоломка с порталами и черным юмором', '/images/portal2.jpg', 4.8, 799.00, '2011-04-19'),
-  ('55555555-5555-5555-5555-555555555556', 'Half-Life: Alyx', 'VR-шуттер от Valve', '/images/half-life-alyx.jpg', 4.7, 1999.00, '2020-03-23'),
-  ('66666666-6666-6666-6666-666666666667', 'Disco Elysium', 'Детектив-RPG с уникальным стилем', '/images/disco-elysium.jpg', 4.6, 1499.00, '2019-10-15')
+  ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Cyberpunk 2077', 'Приключение в открытом мире в ночном городе будущего', 'public/images/cyberpunk.jpg', 4.5, 2999.00, '2020-12-10'),
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'The Witcher 3: Wild Hunt', 'Эпическое RPG приключение в мире ведьмака', 'public/images/witcher3.jpg', 4.9, 1999.00, '2015-05-19'),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'Elden Ring', 'Фэнтезийное действие с открытым миром от создателей Dark Souls', 'public/images/elden-ring.jpg', 4.8, 3499.00, '2022-02-25'),
+  ('dddddddd-dddd-dddd-dddd-dddddddddddd', 'God of War Ragnarök', 'Продолжение эпического приключения Кратоса и Атрея', 'public/images/god-of-war.jpg', 4.9, 3999.00, '2022-11-09'),
+  ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', 'Stray', 'Кошка исследует киберпанк-город', 'public/images/stray.jpg', 4.3, 1499.00, '2022-07-19'),
+  ('ffffffff-ffff-ffff-ffff-ffffffffffff', 'Hollow Knight', 'Исследование подземного королевства насекомых', 'public/images/hollow-knight.jpg', 4.7, 599.00, '2017-02-24'),
+  ('11111111-1111-1111-1111-111111111112', 'Baldur''s Gate 3', 'Эпическая RPG с глубоким сюжетом и тактическими боями', 'public/images/baldurs-gate-3.jpg', 4.9, 3499.00, '2023-08-03'),
+  ('22222222-2222-2222-2222-222222222223', 'Red Dead Redemption 2', 'История бандита в диком западе', 'public/images/rdr2.jpg', 4.8, 2499.00, '2018-10-26'),
+  ('33333333-3333-3333-3333-333333333334', 'The Legend of Zelda: Breath of the Wild', 'Приключение в открытом мире Хайрула', 'public/images/zelda-botw.jpg', 4.9, 3999.00, '20173-03-03'),
+  ('44444444-4444-4444-4444-444444444445', 'Portal 2', 'Головоломка с порталами и черным юмором', 'public/images/portal2.jpg', 4.8, 799.00, '2011-04-19'),
+  ('55555555-5555-5555-5555-555555555556', 'Half-Life: Alyx', 'VR-шуттер от Valve', 'public/images/half-life-alyx.jpg', 4.7, 1999.00, '2020-03-23'),
+  ('66666666-6666-6666-6666-666666666667', 'Disco Elysium', 'Детектив-RPG с уникальным стилем', 'public/images/disco-elysium.jpg', 4.6, 1499.00, '2019-10-15')
 ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title,
   description = EXCLUDED.description,
@@ -365,6 +365,12 @@ CREATE POLICY "Users can manage own favorites" ON user_favorites
 
 CREATE POLICY "Users can manage own games" ON user_games
   FOR ALL USING (auth.uid() = user_id);
+  
+CREATE POLICY "Enable read access for all users" ON game_platforms
+  FOR SELECT USING (true);
+  
+CREATE POLICY "Enable read access for all users" ON game_genres
+  FOR SELECT USING (true);
 
 -- Триггер для обновления updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
