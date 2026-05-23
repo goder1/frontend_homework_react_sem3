@@ -20,6 +20,7 @@ npx supabase start
 
 # Ссылка на сайт
 ```https://694aec460ddf4700081e8c3e--zippy-kulfi-712056.netlify.app/```
+```https://zippy-kulfi-712056.netlify.app/```
 
 # Get Started
 ```bash
